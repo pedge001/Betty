@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html,body{margin:0;padding:0;background:#F8FAFC;color:#0F172A;font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  *{box-sizing:border-box;}
+  a{color:#14284B;} a:hover{color:#E8720C;}
+  @keyframes h24shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</helmet>
+<div style="display:flex; height:100vh; overflow:hidden">
+  <aside style="width:{{ sidebarWidth }}; transition:width .2s ease; background:#14284B; display:flex; flex-direction:column; flex-shrink:0; overflow:hidden">
+    <div style="display:flex; align-items:center; gap:10px; padding:20px 18px 16px; border-bottom:1px solid rgba(255,255,255,0.08); min-height:70px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path d="M3 17.5L21 5.5l-1.8 6.3L7.5 19z" fill="#E8720C"></path><path d="M3 20.5h10" stroke="#E8720C" stroke-width="1.6" stroke-linecap="round"></path></svg>
+      <sc-if value="{{ sidebarOpen }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div style="color:#FFFFFF; font-weight:800; font-size:15px; letter-spacing:0.12em; white-space:nowrap">HANGAR 24</div>
+          <div style="color:#E8720C; font-size:9px; font-weight:700; letter-spacing:0.24em; text-transform:uppercase; margin-top:3px; white-space:nowrap">Born to Fly</div>
+        </div>
+      </sc-if>
+    </div>
+    <nav style="display:flex; flex-direction:column; gap:4px; padding:14px 10px; flex:1">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="4">
+        <button onClick="{{ item.onClick }}" style="display:flex; align-items:center; gap:11px; padding:9px 12px; border:none; border-radius:9px; cursor:pointer; font:inherit; font-size:13.5px; font-weight:600; text-align:left; white-space:nowrap; width:100%; background:{{ item.bg }}; color:{{ item.color }}" style-hover="background:{{ item.hoverBg }}">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="{{ item.icon }}"></path></svg>
+          <sc-if value="{{ sidebarOpen }}" hint-placeholder-val="{{ true }}"><span>{{ item.label }}</span></sc-if>
+        </button>
+      </sc-for>
+    </nav>
+    <div style="padding:14px 18px; border-top:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:8px; min-height:44px">
+      <span style="width:8px; height:8px; border-radius:50%; background:#34D399; flex-shrink:0"></span>
+      <sc-if value="{{ sidebarOpen }}" hint-placeholder-val="{{ true }}"><span style="font-size:11.5px; color:#93A3BE; white-space:nowrap">Betty synced 6 systems · 4:12 AM</span></sc-if>
+    </div>
+  </aside>
+
+  <div style="flex:1; min-width:0; display:flex; flex-direction:column">
+    <header style="height:64px; background:#FFFFFF; border-bottom:1px solid #E2E8F0; display:flex; align-items:center; gap:14px; padding:0 24px; flex-shrink:0">
+      <button onClick="{{ toggleSidebar }}" title="Toggle sidebar" style="border:none; background:transparent; padding:6px; border-radius:8px; cursor:pointer; color:#64748B; display:flex" style-hover="background:#F1F5F9">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      </button>
+      <h1 style="font-size:21px; font-weight:650; color:#14284B; margin:0; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ pageTitle }}</h1>
+      <div style="display:flex; align-items:center; gap:4px; border:1px solid #E2E8F0; border-radius:9px; padding:0 4px 0 12px; background:#FFFFFF; white-space:nowrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round"><path d="M8 2v4M16 2v4M3 9h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path></svg>
+        <select value="{{ rangeValue }}" onChange="{{ onRangeChange }}" style="border:none; background:transparent; font:inherit; font-size:12.5px; font-weight:600; color:#334155; padding:8px 6px 8px 2px; cursor:pointer; outline:none">
+          <option value="mtd">Jul 2026 (MTD)</option>
+          <option value="14d">Last 14 days</option>
+          <option value="7d">Last 7 days</option>
+        </select>
+      </div>
+      <select value="{{ locValue }}" onChange="{{ onLocChange }}" style="border:1px solid #E2E8F0; border-radius:9px; padding:8px 10px; font:inherit; font-size:12.5px; font-weight:600; color:#334155; background:#FFFFFF; cursor:pointer">
+        <option value="all">All locations</option>
+        <option value="0">Redlands, CA</option>
+        <option value="1">Orange County, CA</option>
+        <option value="2">Riverside, CA</option>
+        <option value="3">Lake Havasu City, AZ</option>
+      </select>
+    </header>
+
+    <main data-screen-label="{{ pageTitle }}" style="flex:1; overflow-y:auto; padding:22px 24px 32px; position:relative">
+      <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}"><div style="position:absolute; inset:0; z-index:20; pointer-events:none; background:linear-gradient(100deg, rgba(248,250,252,0) 30%, rgba(255,255,255,0.9) 50%, rgba(248,250,252,0) 70%); background-size:200% 100%; animation:h24shimmer 0.7s linear infinite"></div></sc-if>
+      <div style="opacity:{{ contentOpacity }}; transition:opacity 0.15s">
+      <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(172px, 1fr)); gap:16px; margin-bottom:20px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="5">
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:16px 18px">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px">
+                <div style="font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; white-space:nowrap">{{ k.label }}</div>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">{{ k.source }}</span>
+              </div>
+              <div style="font-size:27px; font-weight:700; color:#14284B; font-variant-numeric:tabular-nums; line-height:1.1">{{ k.value }}</div>
+              <div style="margin-top:8px; font-size:12px; font-weight:600; color:{{ k.color }}; font-variant-numeric:tabular-nums">{{ k.arrow }} {{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:stretch">
+          <div style="flex:3 1 540px; min-width:0; display:flex; flex-direction:column; gap:20px">
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Net revenue — trailing 21 days</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">{{ chartScope }} · {{ periodLabel }}</div>
+                </div>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Toast</span>
+              </div>
+              <div onMouseMove="{{ onRevMove }}" onMouseLeave="{{ onChartLeave }}" style="position:relative; height:224px; margin-top:20px">
+                <sc-for list="{{ gridLines }}" as="g" hint-placeholder-count="4">
+                  <div style="position:absolute; left:0; right:0; bottom:{{ g.bottom }}; border-top:1px dashed #E8EEF5"><span style="position:absolute; right:0; top:-15px; font-size:10px; color:#94A3B8; font-variant-numeric:tabular-nums">{{ g.label }}</span></div>
+                </sc-for>
+                <div style="position:absolute; left:0; right:0; bottom:0; border-top:1px solid #E2E8F0"></div>
+                <svg style="position:absolute; inset:0; width:100%; height:100%; overflow:visible" viewBox="0 0 1000 200" preserveAspectRatio="none">
+                  <path d="{{ revAreaPath }}" fill="rgba(20,40,75,0.07)" opacity="{{ areaOpacity }}"></path>
+                  <path d="{{ revLinePath }}" fill="none" stroke="#14284B" stroke-width="2.5" vector-effect="non-scaling-stroke"></path>
+                </svg>
+                <div style="position:absolute; right:0; bottom:{{ lastDotBottom }}; width:9px; height:9px; border-radius:50%; background:#E8720C; border:2px solid #FFFFFF; box-shadow:0 0 0 1px #E8720C; transform:translate(50%, 50%)"></div>
+                <sc-if value="{{ revTipShow }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; top:0; bottom:0; left:{{ revTipLeft }}; border-left:1px dashed rgba(20,40,75,0.35); pointer-events:none"></div>
+                  <div style="position:absolute; left:{{ revTipLeft }}; bottom:{{ revTipBottom }}; width:9px; height:9px; border-radius:50%; background:#E8720C; border:2px solid #FFFFFF; transform:translate(-50%, 50%); pointer-events:none; z-index:4"></div>
+                  <div style="position:absolute; left:{{ revTipLeft }}; bottom:{{ revTipBottom }}; transform:translate(-50%, -14px); background:#14284B; color:#FFFFFF; font-size:11px; font-weight:600; padding:5px 9px; border-radius:7px; white-space:nowrap; pointer-events:none; z-index:5; font-variant-numeric:tabular-nums">{{ revTipText }}</div>
+                </sc-if>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:10.5px; color:#94A3B8; font-variant-numeric:tabular-nums">
+                <sc-for list="{{ xLabels }}" as="x" hint-placeholder-count="6"><span>{{ x }}</span></sc-for>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Prime cost by location</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">COGS + labor as % of net revenue, vs 60% target</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:14px">
+                  <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#475569"><span style="width:10px; height:10px; border-radius:3px; background:#14284B"></span>COGS</span>
+                  <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#475569"><span style="width:10px; height:10px; border-radius:3px; background:#E8720C"></span>Labor</span>
+                  <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">MarginEdge + Toast + Paylocity</span>
+                </div>
+              </div>
+              <div style="position:relative; height:230px; margin-top:26px">
+                <div style="position:absolute; left:0; right:0; bottom:85.7%; border-top:2px dashed #D97706; z-index:1"><span style="position:absolute; left:0; top:-22px; font-size:10px; font-weight:700; color:#B45309; background:#FFFBEB; border:1px solid #FDE68A; border-radius:5px; padding:1px 7px">60% target</span></div>
+                <div style="position:absolute; left:0; right:0; bottom:0; border-top:1px solid #E2E8F0"></div>
+                <div style="position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:space-around; gap:12px">
+                  <sc-for list="{{ bars }}" as="b" hint-placeholder-count="4">
+                    <div onMouseEnter="{{ b.onEnter }}" onMouseLeave="{{ onGroupLeave }}" style="position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; flex:1; max-width:120px; opacity:{{ b.opacity }}; transition:opacity .2s">
+                      <div style="position:absolute; bottom:100%; left:50%; transform:translate(-50%, -4px); background:#14284B; color:#FFFFFF; font-size:11px; font-weight:600; padding:5px 9px; border-radius:7px; white-space:nowrap; pointer-events:none; z-index:5; opacity:{{ b.tipOpacity }}; transition:opacity .15s; font-variant-numeric:tabular-nums">{{ b.tip }}</div>
+                      <div style="font-size:12.5px; font-weight:700; color:#14284B; margin-bottom:6px; font-variant-numeric:tabular-nums; background:#FFFFFF; border-radius:4px; padding:0 4px; position:relative; z-index:2">{{ b.prime }}</div>
+                      <div style="width:100%; max-width:62px; height:{{ b.laborH }}; background:#E8720C; border-radius:6px 6px 0 0; display:flex; align-items:center; justify-content:center"><span style="font-size:10px; font-weight:700; color:#FFFFFF; font-variant-numeric:tabular-nums">{{ b.labor }}</span></div>
+                      <div style="width:100%; max-width:62px; height:{{ b.cogsH }}; background:#14284B; display:flex; align-items:center; justify-content:center"><span style="font-size:10px; font-weight:700; color:#FFFFFF; font-variant-numeric:tabular-nums">{{ b.cogs }}</span></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex; justify-content:space-around; gap:12px; margin-top:9px">
+                <sc-for list="{{ bars }}" as="b" hint-placeholder-count="4">
+                  <div style="flex:1; max-width:120px; text-align:center; font-size:11px; color:#64748B; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ b.name }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:{{ alertsFlex }}; min-width:280px">
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px; height:100%">
+              <div style="display:flex; align-items:center; gap:9px">
+                <div style="font-size:14.5px; font-weight:650; color:#0F172A">Alerts</div>
+                <span style="font-size:11px; font-weight:700; color:#BE123C; background:#FFF1F2; border-radius:999px; padding:1px 8px; font-variant-numeric:tabular-nums">{{ alertCount }}</span>
+              </div>
+              <div style="display:flex; flex-direction:column; margin-top:6px">
+                <sc-for list="{{ alerts }}" as="al" hint-placeholder-count="4">
+                  <div style="padding:13px 0; border-bottom:{{ al.border }}">
+                    <div style="display:flex; align-items:flex-start; gap:10px">
+                      <span style="width:8px; height:8px; border-radius:50%; background:{{ al.dot }}; margin-top:5px; flex-shrink:0"></span>
+                      <div style="flex:1; min-width:0">
+                        <div style="font-size:13px; font-weight:650; color:#0F172A">{{ al.title }}</div>
+                        <div style="font-size:12px; color:#64748B; margin-top:3px; line-height:1.45; text-wrap:pretty">{{ al.detail }}</div>
+                        <div style="margin-top:8px"><span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">{{ al.source }}</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px; margin-top:20px">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px">
+            <div style="font-size:14.5px; font-weight:650; color:#0F172A">Locations at a glance</div>
+            <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Toast + MarginEdge + Paylocity</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table style="width:100%; border-collapse:collapse; margin-top:14px; font-variant-numeric:tabular-nums; min-width:760px">
+              <thead>
+                <tr>
+                  <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:8px 10px; border-bottom:1px solid #E2E8F0">Location</th>
+                  <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:8px 10px; border-bottom:1px solid #E2E8F0">Revenue (MTD)</th>
+                  <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:8px 10px; border-bottom:1px solid #E2E8F0">COGS %</th>
+                  <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:8px 10px; border-bottom:1px solid #E2E8F0">Labor %</th>
+                  <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:8px 10px; border-bottom:1px solid #E2E8F0">Prime %</th>
+                  <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:8px 10px; border-bottom:1px solid #E2E8F0">21-day trend</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+                  <tr onClick="{{ r.goto }}" title="Open location drill-down" style="background:{{ r.bg }}; cursor:pointer">
+                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9">
+                      <div style="font-size:13px; font-weight:650; color:#0F172A">{{ r.name }}</div>
+                      <div style="font-size:11px; color:#94A3B8; margin-top:2px">{{ r.type }}</div>
+                    </td>
+                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:13px; font-weight:650; color:#14284B">{{ r.revenue }}</td>
+                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ r.cogs }}</td>
+                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ r.labor }}</td>
+                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right"><span style="font-size:11.5px; font-weight:700; border-radius:999px; padding:3px 10px; background:{{ r.pillBg }}; color:{{ r.pillColor }}">{{ r.prime }}</span></td>
+                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ r.spark }}" fill="none" stroke="#14284B" stroke-width="1.5" opacity="0.7"></polyline></svg></td>
+                  </tr>
+                </sc-for>
+                <tr>
+                  <td style="padding:11px 10px"><div style="font-size:13px; font-weight:700; color:#14284B">Company total</div></td>
+                  <td style="padding:11px 10px; text-align:right; font-size:13px; font-weight:700; color:#14284B">{{ totalRow.revenue }}</td>
+                  <td style="padding:11px 10px; text-align:right; font-size:12.5px; font-weight:650; color:#334155">{{ totalRow.cogs }}</td>
+                  <td style="padding:11px 10px; text-align:right; font-size:12.5px; font-weight:650; color:#334155">{{ totalRow.labor }}</td>
+                  <td style="padding:11px 10px; text-align:right"><span style="font-size:11.5px; font-weight:700; border-radius:999px; padding:3px 10px; background:{{ totalRow.pillBg }}; color:{{ totalRow.pillColor }}">{{ totalRow.prime }}</span></td>
+                  <td style="padding:11px 10px; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ totalRow.spark }}" fill="none" stroke="#E8720C" stroke-width="1.5"></polyline></svg></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isLocations }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px">
+          <div>
+            <div style="font-size:20px; font-weight:700; color:#14284B">{{ locName }}</div>
+            <div style="font-size:12.5px; color:#64748B; margin-top:3px">{{ locSub }}</div>
+          </div>
+          <div style="display:inline-flex; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:10px; padding:3px; gap:2px">
+            <sc-for list="{{ locTabs }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.onClick }}" style="border:none; border-radius:8px; padding:7px 13px; font:inherit; font-size:12px; font-weight:650; cursor:pointer; white-space:nowrap; background:{{ t.bg }}; color:{{ t.color }}" style-hover="color:{{ t.hoverColor }}">{{ t.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:14px; margin-bottom:20px">
+          <sc-for list="{{ locKpis }}" as="k" hint-placeholder-count="6">
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:14px 16px">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:9px">
+                <div style="font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; white-space:nowrap">{{ k.label }}</div>
+                <span style="font-size:9px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px; white-space:nowrap">{{ k.source }}</span>
+              </div>
+              <div style="font-size:21px; font-weight:700; color:#14284B; font-variant-numeric:tabular-nums; line-height:1.1">{{ k.value }}</div>
+              <div style="margin-top:7px; font-size:11.5px; font-weight:600; color:{{ k.color }}; font-variant-numeric:tabular-nums">{{ k.arrow }} {{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start">
+          <div style="flex:3 1 560px; min-width:0; display:flex; flex-direction:column; gap:20px">
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                <div style="font-size:14.5px; font-weight:650; color:#0F172A">Sales by daypart</div>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Toast</span>
+              </div>
+              <div style="margin-top:12px">
+                <sc-for list="{{ dayparts }}" as="d" hint-placeholder-count="4">
+                  <div title="{{ d.title }}" style="display:grid; grid-template-columns:92px 1fr 168px; align-items:center; gap:12px; padding:9px 0; border-bottom:{{ d.border }}">
+                    <div style="font-size:12px; font-weight:600; color:#475569">{{ d.label }}</div>
+                    <div style="height:22px; background:#F1F5F9; border-radius:6px; overflow:hidden"><div style="height:100%; width:{{ d.width }}; background:{{ d.color }}; border-radius:6px"></div></div>
+                    <div style="text-align:right; font-size:12.5px; font-weight:650; color:#14284B; font-variant-numeric:tabular-nums">{{ d.revenue }} <span style="color:#94A3B8; font-weight:600">· {{ d.pct }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Menu / product mix</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">Top 8 items by net sales, MTD</div>
+                </div>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Toast</span>
+              </div>
+              <div style="overflow-x:auto">
+                <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:560px">
+                  <thead>
+                    <tr>
+                      <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Item</th>
+                      <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Category</th>
+                      <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Units</th>
+                      <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Net sales</th>
+                      <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Mix %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <sc-for list="{{ menuRows }}" as="m" hint-placeholder-count="8">
+                      <tr style="background:{{ m.bg }}">
+                        <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ m.item }}</td>
+                        <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9"><span style="font-size:10.5px; font-weight:650; color:{{ m.catColor }}; background:{{ m.catBg }}; border-radius:999px; padding:2px 8px; white-space:nowrap">{{ m.cat }}</span></td>
+                        <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ m.units }}</td>
+                        <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ m.sales }}</td>
+                        <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9">
+                          <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px">
+                            <span style="font-size:12px; color:#334155">{{ m.mix }}</span>
+                            <div style="width:48px; height:6px; background:#F1F5F9; border-radius:3px; overflow:hidden"><div style="height:100%; width:{{ m.mixW }}; background:#E8720C; border-radius:3px"></div></div>
+                          </div>
+                        </td>
+                      </tr>
+                    </sc-for>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Sales vs labor — trailing 21 days</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">{{ locShort }} · {{ periodLabel }}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:14px">
+                  <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#475569"><span style="width:10px; height:10px; border-radius:3px; background:rgba(20,40,75,0.8)"></span>Net sales</span>
+                  <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#475569"><span style="width:14px; height:3px; border-radius:2px; background:#E8720C"></span>Labor % of sales</span>
+                  <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Toast + Sling + Paylocity</span>
+                </div>
+              </div>
+              <div onMouseMove="{{ onComboMove }}" onMouseLeave="{{ onChartLeave }}" style="position:relative; height:210px; margin-top:22px">
+                <sc-for list="{{ comboGrid }}" as="g" hint-placeholder-count="4">
+                  <div style="position:absolute; left:0; right:0; bottom:{{ g.bottom }}; border-top:1px dashed #E8EEF5"><span style="position:absolute; right:0; top:-15px; font-size:10px; color:#94A3B8; font-variant-numeric:tabular-nums; background:#FFFFFF; border-radius:3px; padding:0 3px; z-index:3">{{ g.label }}</span></div>
+                </sc-for>
+                <div style="position:absolute; left:0; right:0; bottom:0; border-top:1px solid #E2E8F0"></div>
+                <div style="position:absolute; inset:0; display:flex; align-items:flex-end; gap:3px">
+                  <sc-for list="{{ comboBars }}" as="cb" hint-placeholder-count="21">
+                    <div title="{{ cb.title }}" style="flex:1; height:{{ cb.h }}; background:rgba(20,40,75,0.8); border-radius:3px 3px 0 0"></div>
+                  </sc-for>
+                </div>
+                <div style="position:absolute; left:0; right:0; bottom:{{ laborTargetBottom }}; border-top:2px dashed #D97706; z-index:1"><span style="position:absolute; left:0; top:-22px; font-size:10px; font-weight:700; color:#B45309; background:#FFFBEB; border:1px solid #FDE68A; border-radius:5px; padding:1px 7px">Labor target {{ laborTargetLabel }}</span></div>
+                <svg style="position:absolute; inset:0; width:100%; height:100%; overflow:visible; z-index:2; pointer-events:none" viewBox="0 0 1000 200" preserveAspectRatio="none">
+                  <polyline points="{{ laborLine }}" fill="none" stroke="#E8720C" stroke-width="2.5" vector-effect="non-scaling-stroke"></polyline>
+                </svg>
+                <sc-if value="{{ comboTipShow }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; top:0; bottom:0; left:{{ comboTipLeft }}; border-left:1px dashed rgba(20,40,75,0.35); pointer-events:none; z-index:3"></div>
+                  <div style="position:absolute; left:{{ comboTipLeft }}; bottom:{{ comboTipBottom }}; transform:translate(-50%, -14px); background:#14284B; color:#FFFFFF; font-size:11px; font-weight:600; padding:5px 9px; border-radius:7px; white-space:nowrap; pointer-events:none; z-index:5; font-variant-numeric:tabular-nums">{{ comboTipText }}</div>
+                </sc-if>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:10.5px; color:#94A3B8; font-variant-numeric:tabular-nums">
+                <sc-for list="{{ xLabels }}" as="x" hint-placeholder-count="6"><span>{{ x }}</span></sc-for>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Cost of goods detail</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">Top invoice categories, MTD</div>
+                </div>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">MarginEdge</span>
+              </div>
+              <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums">
+                <thead>
+                  <tr>
+                    <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Category</th>
+                    <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Spend (MTD)</th>
+                    <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">% of sales</th>
+                    <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">vs prior period</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ cogsRows }}" as="c" hint-placeholder-count="6">
+                    <tr style="background:{{ c.bg }}">
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ c.cat }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ c.spend }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ c.pct }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; font-weight:650; color:{{ c.deltaColor }}">{{ c.delta }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="flex:1 1 300px; min-width:280px; display:flex; flex-direction:column; gap:20px">
+            <div style="background:#14284B; border:1px solid #14284B; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:center; gap:8px">
+                <span style="width:8px; height:8px; border-radius:50%; background:#E8720C; flex-shrink:0"></span>
+                <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#E8720C">Betty · Period summary</div>
+              </div>
+              <div style="font-size:13px; color:#DCE4F0; line-height:1.65; margin-top:12px; text-wrap:pretty">{{ locBrief }}</div>
+              <div style="font-size:10.5px; color:#7C8DAB; margin-top:14px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px">Compiled 4:12 AM · Toast, QuickBooks, MarginEdge, Sling, Paylocity, Ekos</div>
+            </div>
+
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:center; gap:9px">
+                <div style="font-size:14.5px; font-weight:650; color:#0F172A">Betty flagged</div>
+                <span style="font-size:11px; font-weight:700; color:#BE123C; background:#FFF1F2; border-radius:999px; padding:1px 8px; font-variant-numeric:tabular-nums">{{ locAlertCount }}</span>
+              </div>
+              <div style="display:flex; flex-direction:column; margin-top:6px">
+                <sc-for list="{{ locAlerts }}" as="al" hint-placeholder-count="3">
+                  <div style="padding:13px 0; border-bottom:{{ al.border }}">
+                    <div style="display:flex; align-items:flex-start; gap:10px">
+                      <span style="width:8px; height:8px; border-radius:50%; background:{{ al.dot }}; margin-top:5px; flex-shrink:0"></span>
+                      <div style="flex:1; min-width:0">
+                        <div style="font-size:13px; font-weight:650; color:#0F172A">{{ al.title }}</div>
+                        <div style="font-size:12px; color:#64748B; margin-top:3px; line-height:1.45; text-wrap:pretty">{{ al.detail }}</div>
+                        <div style="margin-top:8px"><span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">{{ al.source }}</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isLabor }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px">
+          <div style="display:inline-flex; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:10px; padding:3px; gap:2px">
+            <sc-for list="{{ opsTabs }}" as="t" hint-placeholder-count="2">
+              <button onClick="{{ t.onClick }}" style="border:none; border-radius:8px; padding:7px 14px; font:inherit; font-size:12px; font-weight:650; cursor:pointer; white-space:nowrap; background:{{ t.bg }}; color:{{ t.color }}" style-hover="color:{{ t.hoverColor }}">{{ t.label }}</button>
+            </sc-for>
+          </div>
+          <div style="font-size:12px; color:#64748B">{{ opsTabHint }}</div>
+        </div>
+
+        <sc-if value="{{ isLaborTab }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:14px; margin-bottom:20px">
+            <sc-for list="{{ laborKpis }}" as="k" hint-placeholder-count="6">
+              <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:14px 16px">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:9px">
+                  <div style="font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; white-space:nowrap">{{ k.label }}</div>
+                  <span style="font-size:9px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px; white-space:nowrap">{{ k.source }}</span>
+                </div>
+                <div style="font-size:21px; font-weight:700; color:#14284B; font-variant-numeric:tabular-nums; line-height:1.1">{{ k.value }}</div>
+                <div style="margin-top:7px; font-size:11.5px; font-weight:600; color:{{ k.color }}; font-variant-numeric:tabular-nums">{{ k.arrow }} {{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:stretch; margin-bottom:20px">
+            <div style="flex:1 1 420px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Scheduled vs actual hours</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">By location, MTD · variance = actual − scheduled</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px">
+                  <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#475569"><span style="width:10px; height:10px; border-radius:3px; background:#94A3B8"></span>Scheduled</span>
+                  <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#475569"><span style="width:10px; height:10px; border-radius:3px; background:#14284B"></span>Actual</span>
+                  <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Sling + Paylocity</span>
+                </div>
+              </div>
+              <div style="display:flex; justify-content:space-around; gap:12px; align-items:flex-end; margin-top:24px">
+                <sc-for list="{{ hourGroups }}" as="g" hint-placeholder-count="4">
+                  <div onMouseEnter="{{ g.onEnter }}" onMouseLeave="{{ onGroupLeave }}" style="position:relative; flex:1; max-width:130px; display:flex; flex-direction:column; align-items:center">
+                    <div style="position:absolute; bottom:100%; left:50%; transform:translate(-50%, -4px); background:#14284B; color:#FFFFFF; font-size:11px; font-weight:600; padding:5px 9px; border-radius:7px; white-space:nowrap; pointer-events:none; z-index:5; opacity:{{ g.tipOpacity }}; transition:opacity .15s; font-variant-numeric:tabular-nums">{{ g.tip }}</div>
+                    <span style="font-size:10.5px; font-weight:700; border-radius:999px; padding:2px 8px; margin-bottom:8px; font-variant-numeric:tabular-nums; background:{{ g.varBg }}; color:{{ g.varColor }}">{{ g.varLabel }}</span>
+                    <div style="display:flex; gap:5px; align-items:flex-end; height:150px; width:100%; max-width:78px">
+                      <div style="flex:1; height:{{ g.schedH }}; background:#94A3B8; border-radius:4px 4px 0 0"></div>
+                      <div style="flex:1; height:{{ g.actualH }}; background:#14284B; border-radius:4px 4px 0 0"></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="border-top:1px solid #E2E8F0; margin-top:0"></div>
+              <div style="display:flex; justify-content:space-around; gap:12px; margin-top:9px">
+                <sc-for list="{{ hourGroups }}" as="g" hint-placeholder-count="4">
+                  <div style="flex:1; max-width:130px; text-align:center">
+                    <div style="font-size:11px; font-weight:650; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ g.name }}</div>
+                    <div style="font-size:10.5px; color:#94A3B8; margin-top:2px; font-variant-numeric:tabular-nums">{{ g.hrsLabel }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="flex:1.25 1 460px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Labor % of sales — trailing 21 days</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">{{ laborTrendScope }} · Jul 1–21, 2026</div>
+                </div>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Toast + Paylocity</span>
+              </div>
+              <div style="display:inline-flex; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:9px; padding:2px; gap:2px; margin-top:12px">
+                <sc-for list="{{ laborLocTabs }}" as="t" hint-placeholder-count="5">
+                  <button onClick="{{ t.onClick }}" style="border:none; border-radius:7px; padding:4px 10px; font:inherit; font-size:11px; font-weight:650; cursor:pointer; white-space:nowrap; background:{{ t.bg }}; color:{{ t.color }}" style-hover="color:{{ t.hoverColor }}">{{ t.label }}</button>
+                </sc-for>
+              </div>
+              <div onMouseMove="{{ onLtMove }}" onMouseLeave="{{ onChartLeave }}" style="position:relative; height:170px; margin-top:18px">
+                <sc-for list="{{ laborGrid }}" as="g" hint-placeholder-count="4">
+                  <div style="position:absolute; left:0; right:0; bottom:{{ g.bottom }}; border-top:1px dashed #E8EEF5"><span style="position:absolute; right:0; top:-15px; font-size:10px; color:#94A3B8; font-variant-numeric:tabular-nums; background:#FFFFFF; border-radius:3px; padding:0 3px">{{ g.label }}</span></div>
+                </sc-for>
+                <div style="position:absolute; left:0; right:0; bottom:0; border-top:1px solid #E2E8F0"></div>
+                <div style="position:absolute; left:0; right:0; bottom:{{ laborTrendTargetBottom }}; border-top:2px dashed #D97706; z-index:1"><span style="position:absolute; left:0; top:-22px; font-size:10px; font-weight:700; color:#B45309; background:#FFFBEB; border:1px solid #FDE68A; border-radius:5px; padding:1px 7px">Target {{ laborTrendTargetLabel }}</span></div>
+                <svg style="position:absolute; inset:0; width:100%; height:100%; overflow:visible; z-index:2; pointer-events:none" viewBox="0 0 1000 200" preserveAspectRatio="none">
+                  <polyline points="{{ laborTrendLine }}" fill="none" stroke="#E8720C" stroke-width="2.5" vector-effect="non-scaling-stroke"></polyline>
+                </svg>
+                <sc-if value="{{ ltTipShow }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; top:0; bottom:0; left:{{ ltTipLeft }}; border-left:1px dashed rgba(20,40,75,0.35); pointer-events:none; z-index:3"></div>
+                  <div style="position:absolute; left:{{ ltTipLeft }}; bottom:{{ ltTipBottom }}; transform:translate(-50%, -14px); background:#14284B; color:#FFFFFF; font-size:11px; font-weight:600; padding:5px 9px; border-radius:7px; white-space:nowrap; pointer-events:none; z-index:5; font-variant-numeric:tabular-nums">{{ ltTipText }}</div>
+                </sc-if>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:10.5px; color:#94A3B8; font-variant-numeric:tabular-nums">
+                <sc-for list="{{ xLabels }}" as="x" hint-placeholder-count="6"><span>{{ x }}</span></sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px; margin-bottom:20px">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div>
+                <div style="font-size:14.5px; font-weight:650; color:#0F172A">Overtime watch</div>
+                <div style="font-size:12px; color:#64748B; margin-top:3px">Shifts trending into OT, week of Jul 14–20</div>
+              </div>
+              <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Sling + Paylocity</span>
+            </div>
+            <div style="overflow-x:auto">
+              <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:680px">
+                <thead>
+                  <tr>
+                    <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Employee</th>
+                    <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Location</th>
+                    <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Role</th>
+                    <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Sched hrs</th>
+                    <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Actual hrs</th>
+                    <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">OT hrs</th>
+                    <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ otRows }}" as="o" hint-placeholder-count="8">
+                    <tr style="background:{{ o.bg }}">
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ o.name }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ o.loc }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ o.role }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ o.sched }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ o.actual }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:{{ o.otColor }}">{{ o.ot }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right"><span style="font-size:10.5px; font-weight:700; border-radius:999px; padding:3px 9px; white-space:nowrap; background:{{ o.badgeBg }}; color:{{ o.badgeColor }}">{{ o.badge }}</span></td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="background:#EFF3F9; border:1px solid #DCE4F0; border-radius:12px; padding:14px 18px; display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap">
+            <div style="flex:1; min-width:260px; font-size:12.5px; color:#3A5580; line-height:1.55; text-wrap:pretty"><strong style="color:#14284B">How to read this:</strong> scheduled hours come from Sling; actual hours and cost come from Paylocity's processed payroll. Variance compares the two after the nightly sync — a positive number means the floor ran more hours than the schedule called for.</div>
+            <div style="display:flex; gap:6px"><span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#FFFFFF; border:1px solid #DCE4F0; border-radius:999px; padding:2px 7px">Sling</span><span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#FFFFFF; border:1px solid #DCE4F0; border-radius:999px; padding:2px 7px">Paylocity</span></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isProdTab }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:14px; margin-bottom:20px">
+            <sc-for list="{{ prodKpis }}" as="k" hint-placeholder-count="5">
+              <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:14px 16px">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:9px">
+                  <div style="font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; white-space:nowrap">{{ k.label }}</div>
+                  <span style="font-size:9px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px; white-space:nowrap">{{ k.source }}</span>
+                </div>
+                <div style="font-size:21px; font-weight:700; color:#14284B; font-variant-numeric:tabular-nums; line-height:1.1">{{ k.value }}</div>
+                <div style="margin-top:7px; font-size:11.5px; font-weight:600; color:{{ k.color }}; font-variant-numeric:tabular-nums">{{ k.arrow }} {{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:stretch; margin-bottom:20px">
+            <div style="flex:1 1 420px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Production by beer</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">BBL produced MTD · all brewed at Redlands</div>
+                </div>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Ekos</span>
+              </div>
+              <div style="margin-top:12px">
+                <sc-for list="{{ beerBars }}" as="b" hint-placeholder-count="6">
+                  <div title="{{ b.title }}" style="display:grid; grid-template-columns:148px 1fr 76px; align-items:center; gap:12px; padding:8px 0; border-bottom:{{ b.border }}">
+                    <div style="font-size:12px; font-weight:600; color:#475569; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ b.name }}</div>
+                    <div style="height:20px; background:#F1F5F9; border-radius:6px; overflow:hidden"><div style="height:100%; width:{{ b.width }}; background:{{ b.color }}; border-radius:6px"></div></div>
+                    <div style="text-align:right; font-size:12.5px; font-weight:650; color:#14284B; font-variant-numeric:tabular-nums">{{ b.bbl }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="flex:1 1 420px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Finished goods vs par</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">Half-barrel kegs on hand · marker = par level</div>
+                </div>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Ekos</span>
+              </div>
+              <div style="margin-top:12px">
+                <sc-for list="{{ fgBars }}" as="f" hint-placeholder-count="6">
+                  <div title="{{ f.title }}" style="display:grid; grid-template-columns:148px 1fr 104px; align-items:center; gap:12px; padding:8px 0; border-bottom:{{ f.border }}">
+                    <div style="font-size:12px; font-weight:600; color:#475569; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ f.name }}</div>
+                    <div style="position:relative; height:20px; background:#F1F5F9; border-radius:6px">
+                      <div style="height:100%; width:{{ f.width }}; background:{{ f.color }}; border-radius:6px"></div>
+                      <div style="position:absolute; top:-3px; bottom:-3px; left:{{ f.parLeft }}; border-left:2px dashed #14284B; opacity:0.55"></div>
+                    </div>
+                    <div style="text-align:right; font-size:12px; font-variant-numeric:tabular-nums"><span style="font-weight:700; color:{{ f.valColor }}">{{ f.onHand }}</span><span style="color:#94A3B8"> · par {{ f.par }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px; margin-bottom:20px">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div>
+                <div style="font-size:14.5px; font-weight:650; color:#0F172A">Batches in progress</div>
+                <div style="font-size:12px; color:#64748B; margin-top:3px">8 active batches · Redlands brewhouse</div>
+              </div>
+              <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Ekos</span>
+            </div>
+            <div style="overflow-x:auto">
+              <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:760px">
+                <thead>
+                  <tr>
+                    <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Batch</th>
+                    <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Beer</th>
+                    <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Stage</th>
+                    <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Tank</th>
+                    <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Started</th>
+                    <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Ready (proj.)</th>
+                    <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Progress</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ batchRows }}" as="b" hint-placeholder-count="8">
+                    <tr style="background:{{ b.bg }}">
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ b.id }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; color:#334155">{{ b.beer }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9"><span style="font-size:10.5px; font-weight:650; border-radius:999px; padding:2px 8px; white-space:nowrap; background:{{ b.stageBg }}; color:{{ b.stageColor }}">{{ b.stage }}</span></td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ b.tank }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ b.start }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ b.ready }}</td>
+                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9">
+                        <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px">
+                          <span style="font-size:11.5px; color:#334155">{{ b.pct }}</span>
+                          <div style="width:88px; height:6px; background:#F1F5F9; border-radius:3px; overflow:hidden"><div style="height:100%; width:{{ b.pct }}; background:#E8720C; border-radius:3px"></div></div>
+                        </div>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="background:#EFF3F9; border:1px solid #DCE4F0; border-radius:12px; padding:14px 18px; display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap">
+            <div style="flex:1; min-width:260px; font-size:12.5px; color:#3A5580; line-height:1.55; text-wrap:pretty"><strong style="color:#14284B">Production → taproom:</strong> draft depletion across the four taprooms averaged 318 kegs/week MTD (Toast), drawing against finished goods brewed at Redlands (Ekos). Orange Wheat depletes fastest at 41% of company draft volume — which is why its par sits at 300 kegs.</div>
+            <div style="display:flex; gap:6px"><span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#FFFFFF; border:1px solid #DCE4F0; border-radius:999px; padding:2px 7px">Toast</span><span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#FFFFFF; border:1px solid #DCE4F0; border-radius:999px; padding:2px 7px">Ekos</span></div>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ isReports }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ isReportIndex }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size:13px; color:#64748B; margin:-6px 0 18px">Cross-source analyses over your Hangar 24 stack.</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:16px">
+            <sc-for list="{{ reportCards }}" as="c" hint-placeholder-count="8">
+              <div onClick="{{ c.onOpen }}" style="background:#FFFFFF; border:{{ c.border }}; border-radius:16px; padding:20px; cursor:pointer; display:flex; flex-direction:column; gap:10px" style-hover="border-color:#E8720C">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px">
+                  <span style="width:36px; height:36px; border-radius:10px; background:#EFF3F9; display:flex; align-items:center; justify-content:center; flex-shrink:0">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14284B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ c.icon }}"></path></svg>
+                  </span>
+                  <sc-if value="{{ c.featured }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#C2590A; background:#FFF7ED; border:1px solid #FED7AA; border-radius:999px; padding:2px 8px">Featured</span></sc-if>
+                  <sc-if value="{{ c.soon }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 8px">Coming soon</span></sc-if>
+                </div>
+                <div style="font-size:14.5px; font-weight:700; color:#14284B">{{ c.title }}</div>
+                <div style="font-size:12.5px; color:#64748B; line-height:1.55; text-wrap:pretty; flex:1">{{ c.desc }}</div>
+                <div style="font-size:12.5px; font-weight:700; color:{{ c.ctaColor }}">{{ c.cta }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isReportSoon }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ backToReports }}" style="border:none; background:transparent; font:inherit; font-size:13px; font-weight:700; color:#E8720C; cursor:pointer; padding:0; margin-bottom:16px">‹ Reports</button>
+          <div style="background:#FFFFFF; border:1px dashed #CBD5E1; border-radius:16px; padding:52px 32px; text-align:center; max-width:560px; margin:40px auto">
+            <div style="width:44px; height:44px; border-radius:12px; background:#EFF3F9; display:flex; align-items:center; justify-content:center; margin:0 auto 14px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14284B" stroke-width="1.8" stroke-linecap="round"><path d="M12 8v4l2.5 1.5M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path></svg>
+            </div>
+            <div style="font-size:16px; font-weight:700; color:#14284B">{{ soonTitle }}</div>
+            <div style="font-size:13px; color:#64748B; margin-top:8px; line-height:1.6; text-wrap:pretty">{{ soonDesc }}</div>
+            <div style="font-size:12px; color:#94A3B8; margin-top:16px">Coming soon — Betty is still plumbing the data for this one.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isReportPrime }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ backToReports }}" style="border:none; background:transparent; font:inherit; font-size:13px; font-weight:700; color:#E8720C; cursor:pointer; padding:0; margin-bottom:14px">‹ Reports</button>
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap">
+            <div>
+              <div style="font-size:19px; font-weight:700; color:#14284B">Prime Cost Command Center</div>
+              <div style="display:flex; align-items:center; gap:6px; margin-top:8px; flex-wrap:wrap">
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px">Toast</span>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px">MarginEdge</span>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px">Sling + Paylocity</span>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px">QuickBooks Online</span>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:7px; background:#ECFDF5; border:1px solid #A7F3D0; border-radius:999px; padding:5px 12px">
+              <span style="width:7px; height:7px; border-radius:50%; background:#059669"></span>
+              <span style="font-size:11.5px; font-weight:600; color:#047857">Data current — last synced 4:12 AM</span>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:16px 0 18px">
+            <div style="display:inline-flex; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:10px; padding:3px; gap:2px">
+              <sc-for list="{{ rpPeriodTabs }}" as="t" hint-placeholder-count="3">
+                <button onClick="{{ t.onClick }}" style="border:none; border-radius:8px; padding:6px 12px; font:inherit; font-size:11.5px; font-weight:650; cursor:pointer; white-space:nowrap; background:{{ t.bg }}; color:{{ t.color }}" style-hover="color:{{ t.hoverColor }}">{{ t.label }}</button>
+              </sc-for>
+            </div>
+            <div style="display:inline-flex; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:10px; padding:3px; gap:2px">
+              <sc-for list="{{ rpScopeTabs }}" as="t" hint-placeholder-count="5">
+                <button onClick="{{ t.onClick }}" style="border:none; border-radius:8px; padding:6px 12px; font:inherit; font-size:11.5px; font-weight:650; cursor:pointer; white-space:nowrap; background:{{ t.bg }}; color:{{ t.color }}" style-hover="color:{{ t.hoverColor }}">{{ t.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:14px; margin-bottom:20px">
+            <sc-for list="{{ rpKpis }}" as="k" hint-placeholder-count="5">
+              <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:14px 16px">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:9px">
+                  <div style="font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; white-space:nowrap">{{ k.label }}</div>
+                  <span style="font-size:9px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px; white-space:nowrap">{{ k.source }}</span>
+                </div>
+                <div style="font-size:21px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.1; color:{{ k.color }}">{{ k.value }}</div>
+                <div style="margin-top:7px; font-size:11.5px; font-weight:600; color:#64748B">{{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px; margin-bottom:20px">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
+              <div>
+                <div style="font-size:14.5px; font-weight:650; color:#0F172A">Prime cost trend — COGS and labor stacked to prime</div>
+                <div style="font-size:12px; color:#64748B; margin-top:3px">{{ rpScopeName }} · % of net sales · rose shading = over the 60% target</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:14px">
+                <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#475569"><span style="width:10px; height:10px; border-radius:3px; background:rgba(20,40,75,0.75)"></span>COGS %</span>
+                <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#475569"><span style="width:10px; height:10px; border-radius:3px; background:rgba(232,114,12,0.75)"></span>Labor %</span>
+                <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#475569"><span style="width:14px; height:3px; border-radius:2px; background:#0F172A"></span>Prime %</span>
+              </div>
+            </div>
+            <div onMouseMove="{{ onRpMove }}" onMouseLeave="{{ onChartLeave }}" style="position:relative; height:250px; margin-top:20px">
+              <div style="position:absolute; left:0; right:0; bottom:28.57%; border-top:1px dashed #E8EEF5"><span style="position:absolute; right:0; top:-15px; font-size:10px; color:#94A3B8; background:#FFFFFF; border-radius:3px; padding:0 3px; z-index:3">20%</span></div>
+              <div style="position:absolute; left:0; right:0; bottom:57.14%; border-top:1px dashed #E8EEF5"><span style="position:absolute; right:0; top:-15px; font-size:10px; color:#94A3B8; background:#FFFFFF; border-radius:3px; padding:0 3px; z-index:3">40%</span></div>
+              <div style="position:absolute; left:0; right:0; bottom:0; border-top:1px solid #E2E8F0"></div>
+              <svg style="position:absolute; inset:0; width:100%; height:100%" viewBox="0 0 1000 200" preserveAspectRatio="none">
+                <path d="{{ rpCogsArea }}" fill="rgba(20,40,75,0.75)"></path>
+                <path d="{{ rpLaborArea }}" fill="rgba(232,114,12,0.75)"></path>
+                <path d="{{ rpOverArea }}" fill="rgba(225,29,72,0.28)"></path>
+                <path d="{{ rpPrimeLine }}" fill="none" stroke="#0F172A" stroke-width="2.5" vector-effect="non-scaling-stroke"></path>
+              </svg>
+              <div style="position:absolute; left:0; right:0; bottom:{{ rpTargetBottom }}; border-top:2px dashed #BE123C; z-index:2"><span style="position:absolute; left:0; top:-22px; font-size:10px; font-weight:700; color:#BE123C; background:#FFF1F2; border:1px solid #FECDD3; border-radius:5px; padding:1px 7px">Target 60%</span></div>
+              <div style="position:absolute; left:10px; bottom:{{ rpCogsLabelBottom }}; transform:translateY(50%); font-size:10px; font-weight:700; letter-spacing:0.1em; color:#FFFFFF; pointer-events:none">COGS</div>
+              <div style="position:absolute; left:10px; bottom:{{ rpLaborLabelBottom }}; transform:translateY(50%); font-size:10px; font-weight:700; letter-spacing:0.1em; color:#FFFFFF; pointer-events:none">LABOR</div>
+              <sc-if value="{{ rpTipShow }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute; top:0; bottom:0; left:{{ rpTipLeft }}; border-left:1px dashed rgba(15,23,42,0.4); pointer-events:none; z-index:3"></div>
+                <div style="position:absolute; left:{{ rpTipLeft }}; bottom:{{ rpTipBottom }}; transform:translate(-50%, -14px); background:#0F172A; color:#FFFFFF; font-size:11px; padding:6px 10px; border-radius:7px; white-space:nowrap; pointer-events:none; z-index:5; font-variant-numeric:tabular-nums"><div style="font-weight:700">{{ rpTipTitle }}</div><div style="margin-top:2px; color:#CBD5E1">{{ rpTipBody }}</div></div>
+              </sc-if>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:10.5px; color:#94A3B8; font-variant-numeric:tabular-nums">
+              <sc-for list="{{ rpXLabels }}" as="x" hint-placeholder-count="6"><span>{{ x }}</span></sc-for>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:stretch; margin-bottom:20px">
+            <div style="flex:1.25 1 460px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Cost-mix map — what's driving prime cost</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">Right of the line = food cost problem · above = labor problem · bubble size = net sales</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
+                  <sc-for list="{{ rpBubLegend }}" as="lg" hint-placeholder-count="4">
+                    <span style="display:flex; align-items:center; gap:5px; font-size:11px; color:#475569"><span style="width:9px; height:9px; border-radius:50%; background:{{ lg.color }}"></span>{{ lg.label }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex; gap:6px; margin-top:16px">
+                <div style="writing-mode:vertical-rl; transform:rotate(180deg); font-size:10.5px; font-weight:600; color:#64748B; text-align:center; flex-shrink:0">Labor % of sales</div>
+                <div style="flex:1; min-width:0">
+                  <div style="position:relative; height:300px; border:1px solid #EEF2F7; border-radius:8px; overflow:hidden; background:#FFFFFF">
+                    <svg style="position:absolute; inset:0; width:100%; height:100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                      <polygon points="0,16.7 100,100 0,100" fill="rgba(5,150,105,0.06)"></polygon>
+                      <polygon points="0,16.7 100,100 100,0 0,0" fill="rgba(225,29,72,0.05)"></polygon>
+                      <line x1="0" y1="16.7" x2="100" y2="100" stroke="#BE123C" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"></line>
+                    </svg>
+                    <sc-for list="{{ rpBubGridX }}" as="g" hint-placeholder-count="5">
+                      <div style="position:absolute; top:0; bottom:0; left:{{ g.left }}; border-left:1px dashed #EEF2F7"></div>
+                      <div style="position:absolute; bottom:3px; left:{{ g.left }}; transform:translateX(-50%); font-size:9.5px; color:#94A3B8; font-variant-numeric:tabular-nums">{{ g.label }}</div>
+                    </sc-for>
+                    <sc-for list="{{ rpBubGridY }}" as="g" hint-placeholder-count="6">
+                      <div style="position:absolute; left:0; right:0; bottom:{{ g.bottom }}; border-top:1px dashed #EEF2F7"></div>
+                      <div style="position:absolute; left:4px; bottom:{{ g.bottom }}; transform:translateY(50%); font-size:9.5px; color:#94A3B8; font-variant-numeric:tabular-nums">{{ g.label }}</div>
+                    </sc-for>
+                    <div style="position:absolute; left:50%; top:56%; transform:translate(-50%,-100%); font-size:10px; font-weight:700; color:#BE123C; background:#FFF1F2; border:1px solid #FECDD3; border-radius:5px; padding:1px 7px; white-space:nowrap; z-index:2">COGS + Labor = 60% target</div>
+                    <div style="position:absolute; left:10px; bottom:26px; font-size:10px; font-weight:700; color:#047857">UNDER TARGET</div>
+                    <div style="position:absolute; right:10px; top:10px; font-size:10px; font-weight:700; color:#BE123C">OVER TARGET</div>
+                    <sc-for list="{{ rpBubbles }}" as="b" hint-placeholder-count="4">
+                      <div onMouseEnter="{{ b.onEnter }}" onMouseLeave="{{ onGroupLeave }}" style="position:absolute; left:{{ b.left }}; bottom:{{ b.bottom }}; transform:translate(-50%,50%); z-index:3">
+                        <div style="width:{{ b.size }}px; height:{{ b.size }}px; border-radius:50%; background:{{ b.color }}; opacity:0.82; border:2px solid #FFFFFF; box-shadow:0 1px 4px rgba(15,23,42,0.25); cursor:pointer"></div>
+                        <div style="position:absolute; left:50%; top:50%; transform:{{ b.lTransform }}; font-size:10px; font-weight:650; color:#334155; pointer-events:none; white-space:nowrap">{{ b.name }}</div>
+                        <div style="position:absolute; bottom:100%; left:50%; transform:translate(-50%,-8px); background:#0F172A; color:#FFFFFF; font-size:11px; font-weight:600; padding:5px 9px; border-radius:7px; white-space:nowrap; pointer-events:none; z-index:6; opacity:{{ b.tipOpacity }}; transition:opacity .15s; font-variant-numeric:tabular-nums">{{ b.tip }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="text-align:center; font-size:10.5px; font-weight:600; color:#64748B; margin-top:6px">COGS % of sales</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="flex:1 1 380px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Prime cost by location</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">Sorted worst first · dashed line = 60% target</div>
+                </div>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">MarginEdge + Paylocity</span>
+              </div>
+              <div style="margin-top:16px; display:flex; flex-direction:column; gap:14px">
+                <sc-for list="{{ rpDecomp }}" as="d" hint-placeholder-count="4">
+                  <div title="{{ d.title }}">
+                    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px">
+                      <span style="font-size:12px; font-weight:650; color:#334155">{{ d.name }}</span>
+                      <span style="font-size:12.5px; font-weight:700; color:#14284B; font-variant-numeric:tabular-nums">{{ d.prime }}</span>
+                    </div>
+                    <div style="position:relative; height:26px; background:#F1F5F9; border-radius:6px">
+                      <div style="position:absolute; inset:0; display:flex; border-radius:6px; overflow:hidden">
+                        <div style="width:{{ d.cogsW }}; background:rgba(20,40,75,0.85); display:flex; align-items:center; justify-content:center"><span style="font-size:10px; font-weight:700; color:#FFFFFF; font-variant-numeric:tabular-nums">{{ d.cogs }}</span></div>
+                        <div style="width:{{ d.laborW }}; background:#E8720C; display:flex; align-items:center; justify-content:center"><span style="font-size:10px; font-weight:700; color:#FFFFFF; font-variant-numeric:tabular-nums">{{ d.labor }}</span></div>
+                      </div>
+                      <div style="position:absolute; top:-4px; bottom:-4px; left:85.7%; border-left:2px dashed #BE123C"></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex; align-items:center; gap:14px; margin-top:16px">
+                <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#475569"><span style="width:10px; height:10px; border-radius:3px; background:rgba(20,40,75,0.85)"></span>COGS</span>
+                <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#475569"><span style="width:10px; height:10px; border-radius:3px; background:#E8720C"></span>Labor</span>
+                <span style="display:flex; align-items:center; gap:6px; font-size:11px; color:#BE123C"><span style="width:2px; height:12px; background:#BE123C"></span>60% target</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div>
+                <div style="font-size:14.5px; font-weight:650; color:#0F172A">Prime cost detail by location</div>
+                <div style="font-size:12px; color:#64748B; margin-top:3px">Click a column to sort · click a row to expand its drivers</div>
+              </div>
+              <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Toast + MarginEdge + Sling + Paylocity</span>
+            </div>
+            <div style="overflow-x:auto">
+              <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:920px">
+                <thead>
+                  <tr>
+                    <sc-for list="{{ rpCols }}" as="c" hint-placeholder-count="10">
+                      <th onClick="{{ c.onSort }}" style="text-align:{{ c.align }}; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0; cursor:{{ c.cursor }}; white-space:nowrap; user-select:none">{{ c.label }}{{ c.arrow }}</th>
+                    </sc-for>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ rpRows }}" as="r" hint-placeholder-count="4">
+                    <tr onClick="{{ r.onExpand }}" style="background:{{ r.bg }}; cursor:pointer">
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9"><div style="display:flex; align-items:center; gap:7px"><span style="font-size:10px; color:#94A3B8">{{ r.chev }}</span><div><div style="font-size:12.5px; font-weight:650; color:#0F172A">{{ r.loc }}</div><div style="font-size:10.5px; color:#94A3B8">{{ r.type }}</div></div></div></td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ r.sales }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.cogsD }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.cogs }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.laborD }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.labor }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.primeD }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right"><span style="font-size:11.5px; font-weight:700; border-radius:999px; padding:3px 10px; background:{{ r.pillBg }}; color:{{ r.pillColor }}">{{ r.prime }}</span></td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; font-weight:700; color:{{ r.deltaColor }}">{{ r.delta }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ r.spark }}" fill="none" stroke="#14284B" stroke-width="1.5" opacity="0.7"></polyline></svg></td>
+                    </tr>
+                    <tr style="display:{{ r.detailDisplay }}; background:#FFFDF9">
+                      <td colSpan="10" style="padding:16px 18px; border-bottom:1px solid #F1F5F9">
+                        <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start">
+                          <div style="flex:1.2 1 260px; min-width:0">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px"><div style="font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B">Daily prime % · Jul 1–21</div><span style="font-size:9px; font-weight:600; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px">Toast + MarginEdge</span></div>
+                            <div style="position:relative; height:64px; margin-top:10px">
+                              <div style="position:absolute; left:0; right:0; bottom:50%; border-top:1px dashed #BE123C; opacity:0.6"><span style="position:absolute; right:0; top:-14px; font-size:9px; font-weight:700; color:#BE123C">60%</span></div>
+                              <svg style="position:absolute; inset:0; width:100%; height:100%; overflow:visible" viewBox="0 0 300 60" preserveAspectRatio="none"><polyline points="{{ r.miniLine }}" fill="none" stroke="#14284B" stroke-width="2" vector-effect="non-scaling-stroke"></polyline></svg>
+                            </div>
+                          </div>
+                          <div style="flex:1 1 220px; min-width:0">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px"><div style="font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B">Top COGS categories · MTD</div><span style="font-size:9px; font-weight:600; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px">MarginEdge</span></div>
+                            <div style="margin-top:8px">
+                              <sc-for list="{{ r.cogsCats }}" as="cc" hint-placeholder-count="5">
+                                <div style="display:flex; justify-content:space-between; gap:10px; padding:4px 0; font-size:11.5px"><span style="color:#475569">{{ cc.cat }}</span><span style="color:#14284B; font-weight:650; font-variant-numeric:tabular-nums; white-space:nowrap">{{ cc.spend }} <span style="color:#94A3B8; font-weight:600">· {{ cc.pct }}</span></span></div>
+                              </sc-for>
+                            </div>
+                          </div>
+                          <div style="flex:1 1 220px; min-width:0">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px"><div style="font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B">Labor by daypart · MTD</div><span style="font-size:9px; font-weight:600; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px">Sling + Paylocity</span></div>
+                            <div style="margin-top:8px">
+                              <sc-for list="{{ r.dayparts }}" as="dp" hint-placeholder-count="4">
+                                <div style="display:flex; justify-content:space-between; gap:10px; padding:4px 0; font-size:11.5px"><span style="color:#475569">{{ dp.label }}</span><span style="color:#14284B; font-weight:650; font-variant-numeric:tabular-nums; white-space:nowrap">{{ dp.hrs }} hrs <span style="color:#94A3B8; font-weight:600">· labor {{ dp.pct }}</span></span></div>
+                              </sc-for>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+            <div style="font-size:11px; color:#94A3B8; margin-top:14px; border-top:1px solid #F1F5F9; padding-top:10px; text-wrap:pretty">Prime cost = (COGS + Labor) ÷ Net Sales. Target ≤60%. COGS from MarginEdge invoices; Labor from Sling scheduled + Paylocity actual; Sales from Toast; reconciled to the QuickBooks P&amp;L.</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isReportPint }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ backToReports }}" style="border:none; background:transparent; font:inherit; font-size:13px; font-weight:700; color:#E8720C; cursor:pointer; padding:0; margin-bottom:14px">‹ Reports</button>
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap">
+            <div>
+              <div style="font-size:19px; font-weight:700; color:#14284B">True Pint Profitability</div>
+              <div style="font-size:12.5px; color:#64748B; margin-top:4px; max-width:640px; text-wrap:pretty">What each beer actually earns on tap — production cost against pour price and pours across the four taprooms. Draft only; packaged &amp; distribution tracked separately.</div>
+              <div style="display:flex; align-items:center; gap:6px; margin-top:8px; flex-wrap:wrap">
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px">Ekos</span>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px">MarginEdge</span>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px">Toast</span>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:7px; background:#ECFDF5; border:1px solid #A7F3D0; border-radius:999px; padding:5px 12px">
+              <span style="width:7px; height:7px; border-radius:50%; background:#059669"></span>
+              <span style="font-size:11.5px; font-weight:600; color:#047857">Data current — last synced 4:12 AM</span>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:16px 0 18px">
+            <div style="display:inline-flex; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:10px; padding:3px; gap:2px">
+              <sc-for list="{{ ppPeriodTabs }}" as="t" hint-placeholder-count="2">
+                <button onClick="{{ t.onClick }}" style="border:none; border-radius:8px; padding:6px 12px; font:inherit; font-size:11.5px; font-weight:650; cursor:pointer; white-space:nowrap; background:{{ t.bg }}; color:{{ t.color }}" style-hover="color:{{ t.hoverColor }}">{{ t.label }}</button>
+              </sc-for>
+            </div>
+            <div style="display:inline-flex; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:10px; padding:3px; gap:2px">
+              <sc-for list="{{ ppScopeTabs }}" as="t" hint-placeholder-count="5">
+                <button onClick="{{ t.onClick }}" style="border:none; border-radius:8px; padding:6px 12px; font:inherit; font-size:11.5px; font-weight:650; cursor:pointer; white-space:nowrap; background:{{ t.bg }}; color:{{ t.color }}" style-hover="color:{{ t.hoverColor }}">{{ t.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:14px; margin-bottom:20px">
+            <sc-for list="{{ ppKpis }}" as="k" hint-placeholder-count="5">
+              <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:14px 16px">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:9px">
+                  <div style="font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; white-space:nowrap">{{ k.label }}</div>
+                  <span style="font-size:9px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px; white-space:nowrap">{{ k.source }}</span>
+                </div>
+                <div style="font-size:19px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.15; color:{{ k.color }}">{{ k.value }}</div>
+                <div style="margin-top:7px; font-size:11px; font-weight:600; color:#64748B; text-wrap:pretty">{{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:stretch; margin-bottom:20px">
+            <div style="flex:1 1 420px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Margin per pour — price split into cost and margin</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">Sorted by margin per pour · navy = cost, orange = margin</div>
+                </div>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Ekos + MarginEdge + Toast</span>
+              </div>
+              <div style="margin-top:16px; display:flex; flex-direction:column; gap:13px">
+                <sc-for list="{{ heroBars }}" as="b" hint-placeholder-count="6">
+                  <div title="{{ b.title }}">
+                    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px">
+                      <span style="font-size:12px; font-weight:650; color:#334155">{{ b.beer }}</span>
+                      <span style="font-size:11.5px; color:#64748B; font-variant-numeric:tabular-nums">cost {{ b.cost }} · <span style="color:#C2590A; font-weight:700">margin {{ b.margin }}</span> · {{ b.marginPct }}</span>
+                    </div>
+                    <div style="position:relative; height:22px; background:#F6F8FB; border-radius:6px; overflow:hidden; display:flex">
+                      <div style="width:{{ b.costW }}; background:rgba(20,40,75,0.85); display:flex; align-items:center; padding-left:6px"><span style="font-size:9.5px; font-weight:700; color:#FFFFFF; font-variant-numeric:tabular-nums">{{ b.cost }}</span></div>
+                      <div style="width:{{ b.marginW }}; background:#E8720C; display:flex; align-items:center; justify-content:flex-end; padding-right:6px"><span style="font-size:9.5px; font-weight:700; color:#FFFFFF; font-variant-numeric:tabular-nums">{{ b.price }}</span></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="position:relative; height:16px; margin-top:8px">
+                <sc-for list="{{ ppAxisTicks }}" as="t" hint-placeholder-count="5">
+                  <div style="position:absolute; left:{{ t.left }}; top:0; transform:translateX(-50%); font-size:9.5px; color:#94A3B8; font-variant-numeric:tabular-nums">{{ t.label }}</div>
+                </sc-for>
+              </div>
+              <div style="text-align:center; font-size:10.5px; font-weight:600; color:#64748B; margin-top:2px">Pour price ($ per 16oz)</div>
+            </div>
+
+            <div style="flex:1.2 1 460px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Volume vs margin — which taps to push</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">Bubble size = total gross profit · dashed lines = medians</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; max-width:280px; justify-content:flex-end">
+                  <sc-for list="{{ quadLegend }}" as="lg" hint-placeholder-count="6">
+                    <span style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:#475569"><span style="width:9px; height:9px; border-radius:50%; background:{{ lg.color }}"></span>{{ lg.label }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex; gap:6px; margin-top:16px">
+                <div style="writing-mode:vertical-rl; transform:rotate(180deg); font-size:10.5px; font-weight:600; color:#64748B; text-align:center; flex-shrink:0">Pours sold (volume)</div>
+                <div style="flex:1; min-width:0">
+                  <div style="position:relative; height:320px; border:1px solid #EEF2F7; border-radius:8px; overflow:hidden; background:#FFFFFF">
+                    <div style="position:absolute; left:0; width:{{ mgMedLeft }}; bottom:{{ pvMedBottom }}; top:0; background:rgba(5,150,105,0.04)"></div>
+                    <div style="position:absolute; right:0; left:{{ mgMedLeft }}; bottom:{{ pvMedBottom }}; top:0; background:rgba(232,114,12,0.06)"></div>
+                    <div style="position:absolute; left:{{ mgMedLeft }}; top:0; bottom:0; border-left:1.5px dashed #CBD5E1"></div>
+                    <div style="position:absolute; left:0; right:0; bottom:{{ pvMedBottom }}; border-top:1.5px dashed #CBD5E1"></div>
+                    <span style="position:absolute; left:{{ mgMedLeft }}; top:2px; transform:translateX(4px); font-size:9px; font-weight:600; color:#94A3B8">median margin</span>
+                    <sc-for list="{{ ppXTicks }}" as="g" hint-placeholder-count="6">
+                      <div style="position:absolute; top:0; bottom:0; left:{{ g.left }}; border-left:1px dashed #F4F7FA"></div>
+                      <div style="position:absolute; bottom:3px; left:{{ g.left }}; transform:translateX(-50%); font-size:9px; color:#94A3B8; font-variant-numeric:tabular-nums">{{ g.label }}</div>
+                    </sc-for>
+                    <sc-for list="{{ ppYTicks }}" as="g" hint-placeholder-count="4">
+                      <div style="position:absolute; left:0; right:0; bottom:{{ g.bottom }}; border-top:1px dashed #F4F7FA"></div>
+                      <div style="position:absolute; left:4px; bottom:{{ g.bottom }}; transform:translateY(50%); font-size:9px; color:#94A3B8; font-variant-numeric:tabular-nums">{{ g.label }}</div>
+                    </sc-for>
+                    <div style="position:absolute; right:8px; top:6px; font-size:10px; font-weight:700; color:#047857; text-align:right">Pour Stars ★<div style="font-size:8.5px; font-weight:600; color:#94A3B8">high margin + volume</div></div>
+                    <div style="position:absolute; left:8px; top:6px; font-size:10px; font-weight:700; color:#64748B">Volume, thin margin<div style="font-size:8.5px; font-weight:600; color:#94A3B8">revisit price / cost</div></div>
+                    <div style="position:absolute; right:8px; bottom:22px; font-size:10px; font-weight:700; color:#C2590A; text-align:right">Hidden gems<div style="font-size:8.5px; font-weight:600; color:#94A3B8">feature / upsell</div></div>
+                    <div style="position:absolute; left:8px; bottom:22px; font-size:10px; font-weight:700; color:#94A3B8">Review<div style="font-size:8.5px; font-weight:600; color:#CBD5E1">candidates to rotate</div></div>
+                    <sc-for list="{{ quadBubbles }}" as="b" hint-placeholder-count="6">
+                      <div onMouseEnter="{{ b.onEnter }}" onMouseLeave="{{ onGroupLeave }}" style="position:absolute; left:{{ b.left }}; bottom:{{ b.bottom }}; transform:translate(-50%,50%); z-index:3">
+                        <div style="width:{{ b.size }}px; height:{{ b.size }}px; border-radius:50%; background:{{ b.color }}; opacity:0.82; border:2px solid #FFFFFF; box-shadow:0 1px 4px rgba(15,23,42,0.25); cursor:pointer"></div>
+                        <div style="position:absolute; bottom:100%; left:50%; transform:translate(-50%,-8px); background:#0F172A; color:#FFFFFF; font-size:11px; font-weight:600; padding:5px 9px; border-radius:7px; white-space:nowrap; pointer-events:none; z-index:6; opacity:{{ b.tipOpacity }}; transition:opacity .15s; font-variant-numeric:tabular-nums">{{ b.tip }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="text-align:center; font-size:10.5px; font-weight:600; color:#64748B; margin-top:6px">Margin per pour ($)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div>
+                <div style="font-size:14.5px; font-weight:650; color:#0F172A">Draft profitability by beer</div>
+                <div style="font-size:12px; color:#64748B; margin-top:3px">Ranked by total gross profit · click a column to sort · click a row for the cost build-up</div>
+              </div>
+              <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Ekos + MarginEdge + Toast</span>
+            </div>
+            <div style="overflow-x:auto">
+              <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:920px">
+                <thead>
+                  <tr>
+                    <sc-for list="{{ ppCols }}" as="c" hint-placeholder-count="10">
+                      <th onClick="{{ c.onSort }}" style="text-align:{{ c.align }}; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0; cursor:{{ c.cursor }}; white-space:nowrap; user-select:none">{{ c.label }}{{ c.arrow }}</th>
+                    </sc-for>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ ppRows }}" as="r" hint-placeholder-count="6">
+                    <tr onClick="{{ r.onExpand }}" style="background:{{ r.bg }}; cursor:pointer">
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9"><div style="display:flex; align-items:center; gap:7px"><span style="font-size:10px; color:#94A3B8">{{ r.chev }}</span><span style="width:9px; height:9px; border-radius:50%; background:{{ r.dot }}; flex-shrink:0"></span><span style="font-size:12.5px; font-weight:650; color:#0F172A">{{ r.beer }}</span><sc-if value="{{ r.low }}" hint-placeholder-val="{{ false }}"><span style="font-size:9px; font-weight:700; color:#B45309; background:#FFFBEB; border:1px solid #FDE68A; border-radius:999px; padding:1px 6px; white-space:nowrap">low inventory</span></sc-if></div></td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ r.style }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ r.abv }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.cost }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.price }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#C2590A">{{ r.margin }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.marginPct }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.pours }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:700; color:#14284B">{{ r.gp }}</td>
+                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ r.spark }}" fill="none" stroke="#E8720C" stroke-width="1.5" opacity="0.8"></polyline></svg></td>
+                    </tr>
+                    <tr style="display:{{ r.detailDisplay }}; background:#FFFDF9">
+                      <td colSpan="10" style="padding:16px 18px; border-bottom:1px solid #F1F5F9">
+                        <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start">
+                          <div style="flex:1 1 240px; min-width:0">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px"><div style="font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B">Price &amp; pours by taproom</div><span style="font-size:9px; font-weight:600; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px">Toast</span></div>
+                            <div style="margin-top:8px">
+                              <sc-for list="{{ r.byTaproom }}" as="tp" hint-placeholder-count="4">
+                                <div style="display:flex; justify-content:space-between; gap:10px; padding:4px 0; font-size:11.5px"><span style="color:#475569">{{ tp.loc }}</span><span style="color:#14284B; font-weight:650; font-variant-numeric:tabular-nums; white-space:nowrap">{{ tp.price }} <span style="color:#94A3B8; font-weight:600">· {{ tp.pours }} pours</span></span></div>
+                              </sc-for>
+                            </div>
+                          </div>
+                          <div style="flex:1 1 240px; min-width:0">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px"><div style="font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B">Cost build-up / pour</div><span style="font-size:9px; font-weight:600; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px">MarginEdge + Ekos</span></div>
+                            <div style="margin-top:8px">
+                              <sc-for list="{{ r.costRows }}" as="cr" hint-placeholder-count="4">
+                                <div style="display:flex; justify-content:space-between; gap:10px; padding:4px 0; font-size:11.5px; border-top:{{ cr.bt }}; margin-top:{{ cr.mt }}"><span style="color:{{ cr.fc }}; font-weight:{{ cr.fw }}">{{ cr.k }}</span><span style="color:#14284B; font-weight:650; font-variant-numeric:tabular-nums">{{ cr.v }}</span></div>
+                              </sc-for>
+                            </div>
+                          </div>
+                          <div style="flex:1 1 240px; min-width:0">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px"><div style="font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B">Production &amp; inventory</div><span style="font-size:9px; font-weight:600; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px">Ekos</span></div>
+                            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:baseline"><span style="font-size:11.5px; color:#475569">Kegs on hand vs par</span><span style="font-size:12px; font-variant-numeric:tabular-nums"><span style="font-weight:700; color:{{ r.kegColor }}">{{ r.kegs }}</span><span style="color:#94A3B8"> · par {{ r.par }}</span></span></div>
+                            <div style="position:relative; height:16px; background:#F1F5F9; border-radius:5px; margin-top:6px"><div style="height:100%; width:{{ r.kegW }}; background:{{ r.kegColor }}; border-radius:5px"></div><div style="position:absolute; top:-3px; bottom:-3px; left:{{ r.parLeft }}; border-left:2px dashed #14284B; opacity:0.55"></div></div>
+                            <div style="font-size:11px; font-weight:600; color:{{ r.kegColor }}; margin-top:6px">{{ r.kegNote }} · {{ r.batches }} batch(es) in progress</div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+            <div style="font-size:11px; color:#94A3B8; margin-top:14px; border-top:1px solid #F1F5F9; padding-top:10px; text-wrap:pretty">Gross margin per pour = taproom pour price − (production cost/BBL ÷ 248 + packaging). Production cost from Ekos; ingredient &amp; packaging cost from MarginEdge; pour price and pours from Toast. Draft/taproom only; packaged &amp; distribution tracked separately.</div>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ isSync }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:14px; padding:16px 20px; display:flex; align-items:flex-start; gap:12px; margin-bottom:20px">
+          <span style="width:10px; height:10px; border-radius:50%; background:#059669; margin-top:5px; flex-shrink:0"></span>
+          <div>
+            <div style="font-size:14px; font-weight:700; color:#065F46">All configured sources synced — completed 4:12 AM in 12m 38s</div>
+            <div style="font-size:12.5px; color:#047857; margin-top:3px; text-wrap:pretty">Run #412 · Paylocity was rate-limited, retried, and completed · Ekos is not yet configured. Morning digest sent via Resend.</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:14px; margin-bottom:20px">
+          <sc-for list="{{ syncKpis }}" as="k" hint-placeholder-count="5">
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:14px 16px">
+              <div style="font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; white-space:nowrap; margin-bottom:9px">{{ k.label }}</div>
+              <div style="font-size:21px; font-weight:700; color:#14284B; font-variant-numeric:tabular-nums; line-height:1.1">{{ k.value }}</div>
+              <div style="margin-top:7px; font-size:11.5px; font-weight:600; color:{{ k.color }}; font-variant-numeric:tabular-nums">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px; margin-bottom:20px">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+            <div>
+              <div style="font-size:14.5px; font-weight:650; color:#0F172A">Source status</div>
+              <div style="font-size:12px; color:#64748B; margin-top:3px">Independent ingestion workers → Postgres warehouse (Railway) · orchestrated by nightly cron</div>
+            </div>
+            <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Run #412 · Jul 22</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:820px">
+              <thead>
+                <tr>
+                  <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Source</th>
+                  <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Domain</th>
+                  <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Status</th>
+                  <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Rows loaded</th>
+                  <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Duration</th>
+                  <th style="text-align:right; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Last success</th>
+                  <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px 7px 24px; border-bottom:1px solid #E2E8F0">Sync method</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ sourceRows }}" as="sr" hint-placeholder-count="6">
+                  <tr style="background:{{ sr.bg }}">
+                    <td style="padding:10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ sr.name }}</td>
+                    <td style="padding:10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ sr.domain }}</td>
+                    <td style="padding:10px; border-bottom:1px solid #F1F5F9"><span style="font-size:10.5px; font-weight:700; border-radius:999px; padding:3px 9px; white-space:nowrap; background:{{ sr.pillBg }}; color:{{ sr.pillColor }}">{{ sr.status }}</span></td>
+                    <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ sr.rows }}</td>
+                    <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ sr.duration }}</td>
+                    <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ sr.lastSuccess }}</td>
+                    <td style="padding:10px 10px 10px 24px; border-bottom:1px solid #F1F5F9; font-size:11.5px; color:#475569; font-family:ui-monospace, 'SF Mono', Menlo, Consolas, monospace">{{ sr.method }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size:11.5px; color:#B45309; margin-top:10px">Paylocity: rate-limited at 4:03 AM, backed off and retried — completed on attempt 2.</div>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start">
+          <div style="flex:1.3 1 480px; min-width:0; display:flex; flex-direction:column; gap:20px">
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                <div>
+                  <div style="font-size:14.5px; font-weight:650; color:#0F172A">Run history — last 7 nights</div>
+                  <div style="font-size:12px; color:#64748B; margin-top:3px">Bar length = total run duration</div>
+                </div>
+              </div>
+              <div style="margin-top:12px">
+                <sc-for list="{{ runHistory }}" as="r" hint-placeholder-count="7">
+                  <div style="display:grid; grid-template-columns:52px 92px 1fr 68px; align-items:center; gap:12px; padding:7px 0; border-bottom:{{ r.border }}">
+                    <div style="font-size:12px; font-weight:600; color:#475569; font-variant-numeric:tabular-nums">{{ r.date }}</div>
+                    <div><span style="font-size:10px; font-weight:700; border-radius:999px; padding:2px 8px; white-space:nowrap; background:{{ r.pillBg }}; color:{{ r.pillColor }}">{{ r.status }}</span></div>
+                    <div style="height:14px; background:#F1F5F9; border-radius:5px; overflow:hidden"><div style="height:100%; width:{{ r.width }}; background:{{ r.color }}; border-radius:5px"></div></div>
+                    <div style="text-align:right; font-size:11.5px; color:#334155; font-variant-numeric:tabular-nums">{{ r.duration }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size:11.5px; color:#64748B; margin-top:10px; text-wrap:pretty">Jul 20 failure: Toast S3 export was missing at 4:00 AM — the 6:30 AM rerun succeeded. Paylocity has warned on 2 of the last 5 runs.</div>
+            </div>
+
+            <div style="background:#14284B; border:1px solid #14284B; border-radius:16px; padding:20px">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px">
+                <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#E8720C">Recent events · Run #412</div>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#93A3BE; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:999px; padding:2px 7px; white-space:nowrap">Today · 4:00–4:12 AM PT</span>
+              </div>
+              <div style="margin-top:14px; font-family:ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size:11.5px; line-height:1.9">
+                <sc-for list="{{ logRows }}" as="lg" hint-placeholder-count="12">
+                  <div style="display:flex; gap:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">
+                    <span style="color:#7C8DAB; flex-shrink:0">{{ lg.t }}</span>
+                    <span style="color:{{ lg.srcColor }}; flex-shrink:0; min-width:80px">{{ lg.src }}</span>
+                    <span style="color:#DCE4F0; overflow:hidden; text-overflow:ellipsis">{{ lg.msg }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1 1 300px; min-width:280px; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
+            <div style="font-size:14.5px; font-weight:650; color:#0F172A">Sync settings</div>
+            <div style="margin-top:12px; padding-bottom:14px; border-bottom:1px solid #F1F5F9">
+              <div style="font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B">Schedule</div>
+              <div style="font-size:13px; font-weight:650; color:#14284B; margin-top:5px">Nightly 4:00 AM · America/Los_Angeles</div>
+              <div style="font-size:11.5px; color:#64748B; margin-top:4px; line-height:1.5; text-wrap:pretty">Lake Havasu City reports in Arizona MST (no DST); its daily close is normalized in the warehouse.</div>
+            </div>
+            <div style="margin-top:14px; padding-bottom:14px; border-bottom:1px solid #F1F5F9">
+              <div style="font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B">Notifications</div>
+              <div style="display:flex; align-items:center; gap:8px; margin-top:6px">
+                <span style="font-size:13px; font-weight:650; color:#14284B">ops@hangar24.com</span>
+                <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px">via Resend</span>
+              </div>
+              <div style="font-size:11.5px; color:#64748B; margin-top:4px">Morning digest after every run · immediate alert on failure</div>
+            </div>
+            <div style="margin-top:14px">
+              <div style="font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; margin-bottom:4px">Sources</div>
+              <sc-for list="{{ sourceToggles }}" as="st" hint-placeholder-count="6">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:{{ st.border }}">
+                  <div>
+                    <div style="font-size:12.5px; font-weight:650; color:#0F172A">{{ st.name }}</div>
+                    <div style="font-size:10.5px; color:#94A3B8; margin-top:1px; font-family:ui-monospace, 'SF Mono', Menlo, Consolas, monospace">{{ st.method }}</div>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:8px">
+                    <span style="font-size:10px; font-weight:650; color:{{ st.noteColor }}; white-space:nowrap">{{ st.note }}</span>
+                    <div style="width:34px; height:20px; border-radius:999px; background:{{ st.toggleBg }}; position:relative; flex-shrink:0">
+                      <div style="position:absolute; top:2px; left:{{ st.knobLeft }}; width:16px; height:16px; border-radius:50%; background:#FFFFFF; box-shadow:0 1px 2px rgba(15,23,42,0.25)"></div>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;alertsPlacement&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Right rail&quot;,&quot;Below&quot;],&quot;default&quot;:&quot;Right rail&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;revenueChartStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Area&quot;,&quot;Line&quot;],&quot;default&quot;:&quot;Area&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Charts&quot;}}">
+class Component extends DCLogic {
+  state = { view: 'overview', collapsed: false, loc: 'all', drill: 1, opsTab: 'labor', laborLoc: 'all', range: 'mtd', loading: false, tt: null, hb: null,
+    reportView: 'index', soonTitle: '', soonDesc: '', rpPeriod: 'mtd', rpScope: 'all', rpSortKey: 'prime', rpSortDir: 1, rpExpand: null,
+    ppPeriod: 'mtd', ppScope: 'all', ppSortKey: 'gp', ppSortDir: -1, ppExpand: null };
+  rpSeries(scope, period){
+    const isW = period==='13w';
+    let labels, sales;
+    if (isW) {
+      labels = ['Apr 26','May 3','May 10','May 17','May 24','May 31','Jun 7','Jun 14','Jun 21','Jun 28','Jul 5','Jul 12','Jul 19'];
+      const cw = Array.from({length:13},(_,i)=> 158+1.5*i+6*Math.sin(i*1.7));
+      sales = scope==null ? cw : cw.map((v,i)=> v*(this.LOCS[scope].revenue/this.COMPANY.revenue)*(1+0.12*Math.sin(i*1.9+scope*2.3)));
+    } else {
+      labels = Array.from({length:21},(_,i)=> 'Jul '+(i+1));
+      sales = this.series(scope);
+    }
+    const baseC = scope==null ? this.COMPANY.cogs : this.LOCS[scope].cogs;
+    const baseL = scope==null ? this.COMPANY.labor : this.LOCS[scope].labor;
+    const avg = sales.reduce((a,b)=>a+b,0)/sales.length;
+    const seed = scope==null ? 7 : scope;
+    const cogsSer = sales.map((v,i)=> baseC + 0.8*Math.sin(i*1.27+seed*1.1));
+    const laborSer = sales.map((v,i)=> baseL + (avg-v)/avg*6 + 0.7*Math.sin(i*2.1+seed));
+    const primeSer = cogsSer.map((c,i)=> c+laborSer[i]);
+    return {labels, sales, cogsSer, laborSer, primeSer};
+  }
+  flash(part){ clearTimeout(this._t); this.setState(Object.assign({loading:true}, part)); this._t = setTimeout(()=>this.setState({loading:false}), 500); }
+  LABOR_HRS = [{sched:3270, actual:3240, ot:38},{sched:2640, actual:2760, ot:84},{sched:2120, actual:2130, ot:27},{sched:1590, actual:1710, ot:65}];
+  OT_ROWS = [
+    ['M. Alvarez', 3, 'Line cook', 40.0, 46.5, 6.5],
+    ['J. Whitfield', 1, 'Server', 38.0, 43.0, 5.0],
+    ['D. Okafor', 1, 'Kitchen lead', 40.0, 44.5, 4.5],
+    ['S. Trujillo', 3, 'Bartender', 36.0, 40.0, 4.0],
+    ['K. Nguyen', 0, 'Packaging tech', 40.0, 43.5, 3.5],
+    ['R. Castillo', 2, 'Line cook', 38.0, 40.5, 2.5],
+    ['A. Brandt', 1, 'Host', 32.0, 33.0, 1.0],
+    ['T. Meyer', 2, 'Server', 38.0, 38.0, 0.0]
+  ];
+  PROD_BEERS = [['Orange Wheat',560],['Betty IPA',260],['Pacific Coast Hazy',210],['Firebreak Cold IPA',165],['Mango Island',150],['American Light',135]];
+  BATCHES = [
+    ['B-2610','Pacific Coast Hazy','Packaging','BT-04','Jul 3','Jul 24',92],
+    ['B-2612','Mango Island','Conditioning','BT-01','Jul 6','Jul 23',85],
+    ['B-2609','Betty IPA','Conditioning','BT-02','Jul 8','Jul 24',80],
+    ['B-2607','Orange Wheat','Fermentation','FV-03','Jul 14','Jul 28',45],
+    ['B-2611','Firebreak Cold IPA','Fermentation','FV-07','Jul 15','Aug 2',38],
+    ['B-2608','Orange Wheat','Fermentation','FV-05','Jul 17','Jul 31',30],
+    ['B-2613','American Light','Fermentation','FV-02','Jul 18','Aug 4',22],
+    ['B-2614','Orange Wheat','Brewing','BH-01','Jul 21','Aug 8',6]
+  ];
+  FG_PAR = [['Orange Wheat',388,300],['Betty IPA',176,150],['Pacific Coast Hazy',76,120],['Firebreak Cold IPA',118,110],['Mango Island',88,96],['American Light',296,240]];
+  // beer, style, abv, cost/pour, price, pours, brewCostBBL, ingr/pour, pkg/pour, kegs, par, batches
+  PINT = [
+    {beer:'Orange Wheat', style:'Wheat Ale', abv:4.7, cost:0.42, price:6.50, pours:9200, brewBBL:50, ingr:0.12, pkg:0.10, kegs:388, par:300, batches:2, low:false},
+    {beer:'American Light', style:'Light Lager', abv:4.2, cost:0.34, price:5.50, pours:7800, brewBBL:40, ingr:0.10, pkg:0.08, kegs:296, par:240, batches:1, low:false},
+    {beer:'Betty IPA', style:'West Coast IPA', abv:6.8, cost:0.58, price:7.50, pours:6400, brewBBL:70, ingr:0.16, pkg:0.14, kegs:176, par:150, batches:1, low:false},
+    {beer:'Pacific Coast Hazy', style:'Hazy IPA', abv:6.5, cost:0.71, price:8.00, pours:5800, brewBBL:84, ingr:0.21, pkg:0.16, kegs:76, par:120, batches:1, low:true},
+    {beer:'Firebreak Cold IPA', style:'Cold IPA', abv:6.2, cost:0.55, price:7.50, pours:4100, brewBBL:64, ingr:0.16, pkg:0.13, kegs:118, par:110, batches:1, low:false},
+    {beer:'Mango Island', style:'Fruited Ale', abv:5.4, cost:0.63, price:7.75, pours:3600, brewBBL:74, ingr:0.18, pkg:0.15, kegs:88, par:96, batches:1, low:false}
+  ];
+  // ============================================================================
+  // ⚠️ HANDOFF NOTE — MOCK DATA (all fields below through the constants block)
+  // Everything from here down is HARDCODED demo data, internally consistent so
+  // location figures roll up to the company totals. In the real build this must
+  // be replaced by a data layer sourced from the six nightly integrations:
+  //   Toast (sales) · QuickBooks Online (financials) · MarginEdge (food/bev cost)
+  //   Sling (scheduling) · Paylocity (payroll) · Ekos (production/inventory)
+  // No values here are live; do not treat as source-of-truth numbers.
+  // ============================================================================
+  DAILY = [26.0,28.1,42.8,48.8,42.6,26.2,26.5,28.3,29.1,44.0,49.4,41.2,26.5,28.6,29.4,30.2,45.1,49.6,41.6,27.6,30.4]; // $k, sums to 742
+  LOCS = [
+    {name:'Redlands, CA', type:'Brewery + Taproom', revenue:268000, cogs:30, labor:27, prime:57, delta:5.1},
+    {name:'Orange County, CA', type:'Taproom + Restaurant', revenue:196000, cogs:33, labor:31, prime:64, delta:13.0},
+    {name:'Riverside, CA', type:'Taproom + Restaurant', revenue:158000, cogs:33, labor:30, prime:63, delta:6.0},
+    {name:'Lake Havasu City, AZ', type:'Taproom + Restaurant', revenue:120000, cogs:34, labor:32, prime:66, delta:3.8}
+  ];
+  COMPANY = { revenue:742000, delta:7.2, prime:61.6, cogs:32.1, labor:29.5, comps:3.6, bbl:1480 };
+  BEERS = ['Orange Wheat','Betty IPA','Pacific Coast Hazy','Firebreak Cold IPA','Mango Island','American Light'];
+  DAYPARTS = ['Lunch','Happy Hour','Dinner','Late night'];
+  LOC_DETAIL = [
+    { check:24.50, checkDelta:1.2, guests:10939, guestsDelta:3.8, laborTarget:30, dayparts:[18,26,38,18],
+      menu:[
+        {item:'Orange Wheat (draft)', cat:'Draft Beer', units:6240, sales:43680},
+        {item:'Orange Wheat 6-pack', cat:'Packaged', units:2910, sales:26190},
+        {item:'Betty IPA (draft)', cat:'Draft Beer', units:3420, sales:25650},
+        {item:'Pacific Coast Hazy (draft)', cat:'Draft Beer', units:2610, sales:20880},
+        {item:'Hangar Smash Burger', cat:'Food Truck', units:1540, sales:20020},
+        {item:'Mixed 4-pack to-go', cat:'Packaged', units:1120, sales:17920},
+        {item:'Firebreak Cold IPA (draft)', cat:'Draft Beer', units:1880, sales:15040},
+        {item:'Street Tacos', cat:'Food Truck', units:1760, sales:14080}
+      ],
+      cogs:[['Brewing ingredients',31500,3.1],['Packaging (cans / kegs)',18900,6.4],['Protein (food truck)',9400,2.2],['Dry goods',7600,-1.4],['Produce',6200,4.8],['Gases & chemicals',4000,0.9],['Dairy',2800,-2.1]],
+      alerts:[
+        {sev:'#D97706', title:'Pacific Coast Hazy below par', detail:'Finished goods at 38 BBL vs 60 BBL par. Packaging run scheduled Jul 24.', source:'Ekos'},
+        {sev:'#059669', title:'Prime cost 3 pts under target', detail:'57.0% — best in company for the fourth straight month.', source:'Toast + MarginEdge'},
+        {sev:'#94A3B8', title:'Canning line PM on Jul 24', detail:'Scheduled maintenance overlaps the Hazy packaging run — Ekos shows a 4-hour window.', source:'Ekos'}
+      ],
+      brief:'Redlands remains the flagship: prime cost at 57%, three points under target. Draft and packaged Orange Wheat carry 26% of location revenue. Production is on plan at 1,480 BBL MTD; the one watch item is Pacific Coast Hazy finished goods sitting below par ahead of the Jul 24 packaging run.' },
+    { check:36.20, checkDelta:2.1, guests:5414, guestsDelta:10.6, laborTarget:30, dayparts:[24,18,46,12],
+      menu:[
+        {item:'Smash Burger', cat:'Food', units:2140, sales:32100},
+        {item:'Orange Wheat (draft)', cat:'Draft Beer', units:3890, sales:27230},
+        {item:'Fish Tacos', cat:'Food', units:1510, sales:24160},
+        {item:'Betty IPA (draft)', cat:'Draft Beer', units:2340, sales:17550},
+        {item:'Truffle Fries', cat:'Food', units:1980, sales:15840},
+        {item:'BBQ Chicken Pizza', cat:'Food', units:880, sales:14960},
+        {item:'Pacific Coast Hazy (draft)', cat:'Draft Beer', units:1720, sales:13760},
+        {item:'Firebreak Cold IPA (draft)', cat:'Draft Beer', units:1240, sales:9920}
+      ],
+      cogs:[['Protein',21400,5.6],['Produce',12800,3.9],['Dry goods',9600,1.2],['Beer transfers (Redlands)',8800,7.4],['Dairy',7900,2.3],['Packaging & disposables',4200,-0.8]],
+      alerts:[
+        {sev:'#D97706', title:'Labor 1 pt over target', detail:'31.0% vs the 30% target — weekend dinner shifts ran 9% more scheduled hours than sales supported.', source:'Sling + Paylocity'},
+        {sev:'#D97706', title:'Comps at 4.4% of sales', detail:'New-store promos running above the 3.5% company norm; 62% tied to the mug club launch.', source:'Toast'},
+        {sev:'#059669', title:'Revenue ramp on track', detail:'+13.0% vs June — strongest growth in the company.', source:'Toast'}
+      ],
+      brief:'Orange County revenue is up 13.0% MTD as the new location ramps. Labor is 1 pt over the 30% target, driven by opening-period overstaffing on weekend dinner shifts — the last two Sling schedules ran 9% more hours than sales supported. COGS is holding at 33%; comps are elevated but concentrated in the mug club launch.' },
+    { check:33.80, checkDelta:0.8, guests:4675, guestsDelta:5.1, laborTarget:30, dayparts:[25,19,44,12],
+      menu:[
+        {item:'Brewery Burger', cat:'Food', units:1690, sales:25350},
+        {item:'Orange Wheat (draft)', cat:'Draft Beer', units:3120, sales:21840},
+        {item:'Carnitas Bowl', cat:'Food', units:1180, sales:17700},
+        {item:'Betty IPA (draft)', cat:'Draft Beer', units:1890, sales:14180},
+        {item:'Hangar Wings', cat:'Food', units:1420, sales:12780},
+        {item:'Pacific Coast Hazy (draft)', cat:'Draft Beer', units:1360, sales:10880},
+        {item:'Firebreak Cold IPA (draft)', cat:'Draft Beer', units:980, sales:7840},
+        {item:'Orange Wheat 6-pack', cat:'Packaged', units:720, sales:6480}
+      ],
+      cogs:[['Protein',17200,2.8],['Produce',10300,4.1],['Dry goods',7800,0.6],['Beer transfers (Redlands)',7000,3.2],['Dairy',6400,1.9],['Packaging & disposables',3400,-1.2]],
+      alerts:[
+        {sev:'#D97706', title:'Prime cost at 63.0%', detail:'1 pt into the red band; dinner labor Thu–Sat consistently runs over schedule.', source:'MarginEdge + Paylocity'},
+        {sev:'#94A3B8', title:'Toast offline 22 min on Jul 14', detail:'Auto-recovered; the nightly sync backfilled all checks.', source:'Toast'}
+      ],
+      brief:'Riverside is steady: revenue up 6.0% MTD with prime cost at 63%, one point into the red band. Food mix is strengthening — burger and bowls both up — but dinner labor Thursday through Saturday consistently runs over the Sling schedule. COGS is in line at 33%.' },
+    { check:31.40, checkDelta:-0.6, guests:3822, guestsDelta:4.5, laborTarget:30, dayparts:[26,20,42,12],
+      menu:[
+        {item:'Havasu Burger', cat:'Food', units:1380, sales:20700},
+        {item:'Orange Wheat (draft)', cat:'Draft Beer', units:2650, sales:18550},
+        {item:'Fish & Chips', cat:'Food', units:940, sales:15040},
+        {item:'Mango Island (draft)', cat:'Draft Beer', units:1410, sales:10580},
+        {item:'Betty IPA (draft)', cat:'Draft Beer', units:1290, sales:9680},
+        {item:'Street Corn', cat:'Food', units:1120, sales:8960},
+        {item:'American Light (draft)', cat:'Draft Beer', units:1180, sales:7080},
+        {item:'Pacific Coast Hazy (draft)', cat:'Draft Beer', units:860, sales:6880}
+      ],
+      cogs:[['Protein',13600,6.1],['Produce',8100,5.4],['Dry goods',6200,2.0],['Beer transfers (Redlands)',5200,1.8],['Dairy',5000,3.5],['Packaging & disposables',2700,0.4]],
+      alerts:[
+        {sev:'#E11D48', title:'Labor at 32.0%', detail:'2 pts over the 30% target MTD. A lighter mid-week schedule is queued in Sling for review.', source:'Paylocity + Sling'},
+        {sev:'#E11D48', title:'Prime cost 66.0% — company high', detail:'COGS 34% and labor 32% both over target in the summer slow season.', source:'MarginEdge'},
+        {sev:'#94A3B8', title:'Guest count down vs spring', detail:'Summer heat pattern: guests -8% vs the Mar–May average; avg check holding.', source:'Toast'}
+      ],
+      brief:'Lake Havasu is feeling the summer slump — guest counts are down against spring averages while labor holds at 32%, two points over target. Prime cost at 66% is the highest in the company. A lighter mid-week Sling schedule is queued for review; avg check is holding, so the lever is hours, not menu.' }
+  ];
+  ALERTS = [
+    {sev:'#E11D48', title:'Lake Havasu labor at 32.0%', detail:'2.0 pts over the 30% location target MTD. Review the Sling schedule before the Jul 25 weekend.', source:'Paylocity + Sling'},
+    {sev:'#D97706', title:'Company prime cost above target', detail:'61.6% vs the 60% ceiling — driven by labor at the three restaurant locations.', source:'MarginEdge + Paylocity'},
+    {sev:'#D97706', title:'Pacific Coast Hazy below par', detail:'Finished goods at 38 BBL vs 60 BBL par. Next packaging run scheduled Jul 24.', source:'Ekos'},
+    {sev:'#059669', title:'Redlands prime cost at 57.0%', detail:'3 pts under target — best in company for the fourth straight month.', source:'Toast + MarginEdge'}
+  ];
+
+  fmt$(n){ return '$' + n.toLocaleString('en-US'); }
+  series(idx){
+    if (idx == null) return this.DAILY;
+    const share = this.LOCS[idx].revenue / this.COMPANY.revenue;
+    return this.DAILY.map((v,i)=> v*share*(1+0.16*Math.sin(i*1.9+idx*2.3)));
+  }
+  scale(max){
+    for (const s of [2,4,5,10,15,20]) { const top=Math.ceil(max/s)*s, n=top/s; if(n>=3&&n<=5) return {top,step:s}; }
+    return {top:Math.ceil(max/10)*10, step:10};
+  }
+  costColor(diff, hi){ return diff<=0 ? '#059669' : diff<=hi ? '#D97706' : '#E11D48'; }
+  primeStyle(p){ return p<58 ? {bg:'#ECFDF5',fg:'#047857'} : p<=62 ? {bg:'#FFFBEB',fg:'#B45309'} : {bg:'#FFF1F2',fg:'#BE123C'}; }
+
+  renderVals(){
+    const s=this.state, locIdx = s.loc==='all' ? null : +s.loc;
+    const L = locIdx==null ? null : this.LOCS[locIdx];
+    const N = ({mtd:21, '14d':14, '7d':7})[s.range];
+    const fullSum = this.DAILY.reduce((a,b)=>a+b,0);
+    const factor = this.DAILY.slice(-N).reduce((a,b)=>a+b,0)/fullSum;
+    const win = a => a.slice(-N);
+    const sc$ = v => Math.round(v*factor/100)*100;
+    const firstDay = 22-N;
+    const xLabels = Array.from({length:6},(_,i)=> 'Jul '+(firstDay+Math.round(i*(N-1)/5)));
+    const periodLabel = 'Jul '+firstDay+'–21, 2026';
+    const tipDay = i => 'Jul '+(firstDay+i);
+    const lineMove = (id,n) => e => { const r=e.currentTarget.getBoundingClientRect(); const i=Math.max(0,Math.min(n-1,Math.round((e.clientX-r.left)/r.width*(n-1)))); const c=this.state.tt; if(!c||c.id!==id||c.idx!==i) this.setState({tt:{id,idx:i}}); };
+    const titles = {overview:'Executive Overview', locations:'Locations', labor:'Labor & Production', reports:'Reports', sync:'Sync Health'};
+    const icons = {
+      overview:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
+      locations:'M12 21c-4.4-4-7-7.5-7-11a7 7 0 0 1 14 0c0 3.5-2.6 7-7 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+      labor:'M5 20v-7M12 20V5M19 20v-11',
+      reports:'M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5M9 13h6M9 17h4',
+      sync:'M21 12a9 9 0 1 1-2.64-6.36M21 3v5h-5'
+    };
+    const navItems = Object.keys(titles).map(k=>({
+      label: titles[k], icon: icons[k],
+      bg: s.view===k ? 'rgba(232,114,12,0.16)' : 'transparent',
+      color: s.view===k ? '#FCA55F' : '#93A3BE',
+      hoverBg: s.view===k ? 'rgba(232,114,12,0.16)' : 'rgba(255,255,255,0.07)',
+      onClick: ()=> this.flash(k==='reports' ? {view:k, reportView:'index', rpExpand:null, ppExpand:null} : {view:k})
+    }));
+
+    const rev = L? L.revenue : this.COMPANY.revenue;
+    const delta = L? L.delta : this.COMPANY.delta;
+    const cogs = L? L.cogs : this.COMPANY.cogs;
+    const labor = L? L.labor : this.COMPANY.labor;
+    const prime = L? L.prime : this.COMPANY.prime;
+    const laborT = L? 30 : 29;
+    const pts = d => (d>=0?'+':'')+d.toFixed(1);
+    const kpis = [
+      {label:'Net revenue', value:this.fmt$(sc$(rev)), arrow:'↑', sub:pts(delta)+'% vs June', color:'#059669', source:'Toast'},
+      {label:'Prime cost', value:prime.toFixed(1)+'%', arrow:prime>60?'↑':'↓', sub:pts(prime-60)+' pts vs 60% target', color:prime<58?'#059669':prime<=62?'#D97706':'#E11D48', source:'MarginEdge + Paylocity'},
+      {label:'COGS', value:cogs.toFixed(1)+'%', arrow:cogs>32?'↑':'↓', sub:pts(cogs-32)+' pts vs 32% target', color:this.costColor(cogs-32,1), source:'MarginEdge'},
+      {label:'Labor', value:labor.toFixed(1)+'%', arrow:labor>laborT?'↑':'↓', sub:pts(labor-laborT)+' pts vs '+laborT+'% target', color:this.costColor(labor-laborT,1), source:'Paylocity'},
+      (L && locIdx!==0)
+        ? {label:'Production', value:'—', arrow:'', sub:'All brewing at Redlands', color:'#94A3B8', source:'Ekos'}
+        : {label:'Production', value:Math.round(1480*factor).toLocaleString('en-US')+' BBL', arrow:'↑', sub:'+4.3% vs plan', color:'#059669', source:'Ekos'}
+    ];
+
+    const ser = win(this.series(locIdx));
+    const {top, step} = this.scale(Math.max(...ser));
+    const gridLines=[]; for(let v=step; v<=top; v+=step) gridLines.push({label:'$'+v+'k', bottom:(v/top*100).toFixed(2)+'%'});
+    const pt=(v,i)=> (i/(ser.length-1)*1000).toFixed(1)+' '+(200-v/top*200).toFixed(1);
+    const revLinePath = 'M'+ser.map(pt).join(' L');
+    const revAreaPath = revLinePath+' L1000 200 L0 200 Z';
+    const rt = s.tt && s.tt.id==='rev' ? s.tt.idx : null;
+    const onRevMove = lineMove('rev', ser.length);
+
+    const bars = this.LOCS.map((l,i)=>({
+      name:l.name.replace(/, (CA|AZ)$/,''), prime:l.prime+'%', labor:l.labor+'%', cogs:l.cogs+'%',
+      laborH:(l.labor/70*100).toFixed(1)+'%', cogsH:(l.cogs/70*100).toFixed(1)+'%',
+      opacity: locIdx==null||locIdx===i ? 1 : 0.3,
+      tip:'COGS '+l.cogs+'% + labor '+l.labor+'% = prime '+l.prime+'%',
+      tipOpacity: s.hb&&s.hb.id==='prime'&&s.hb.idx===i ? 1 : 0,
+      onEnter: ()=>this.setState({hb:{id:'prime',idx:i}})
+    }));
+
+    const spark = idx => {
+      const sr=win(this.series(idx)), mn=Math.min(...sr), mx=Math.max(...sr);
+      return sr.map((v,i)=> (i/(sr.length-1)*100).toFixed(1)+','+(25-((v-mn)/(mx-mn))*21).toFixed(1)).join(' ');
+    };
+    const rows = this.LOCS.map((l,i)=>{ const ps=this.primeStyle(l.prime); return {
+      name:l.name, type:l.type, revenue:this.fmt$(sc$(l.revenue)), cogs:l.cogs.toFixed(1)+'%', labor:l.labor.toFixed(1)+'%',
+      prime:l.prime.toFixed(1)+'%', pillBg:ps.bg, pillColor:ps.fg, spark:spark(i),
+      bg: locIdx===i ? '#FFF7ED' : (i%2 ? '#F8FAFC' : '#FFFFFF'),
+      goto: ()=> this.flash({view:'locations', drill:i})
+    };});
+    const cps=this.primeStyle(this.COMPANY.prime);
+    const totalRow={ revenue:this.fmt$(sc$(this.COMPANY.revenue)), cogs:this.COMPANY.cogs.toFixed(1)+'%', labor:this.COMPANY.labor.toFixed(1)+'%', prime:this.COMPANY.prime.toFixed(1)+'%', pillBg:cps.bg, pillColor:cps.fg, spark:spark(null)};
+
+    const alerts = this.ALERTS.map((a,i)=>({dot:a.sev, title:a.title, detail:a.detail, source:a.source, border: i<this.ALERTS.length-1?'1px solid #F1F5F9':'none'}));
+
+    // ---- Locations drill-down ----
+    const di = s.drill, LD = this.LOCS[di], D = this.LOC_DETAIL[di];
+    const locShortName = n => n.replace(/, (CA|AZ)$/,'');
+    const locTabs = this.LOCS.map((l,i)=>({
+      label: locShortName(l.name),
+      bg: di===i ? '#14284B' : 'transparent',
+      color: di===i ? '#FFFFFF' : '#64748B',
+      hoverColor: di===i ? '#FFFFFF' : '#14284B',
+      onClick: ()=> this.flash({drill:i})
+    }));
+    const dpc = this.primeStyle(LD.prime);
+    const locKpis = [
+      {label:'Net revenue', value:this.fmt$(sc$(LD.revenue)), arrow:LD.delta>=0?'↑':'↓', sub:pts(LD.delta)+'% vs June', color:LD.delta>=0?'#059669':'#E11D48', source:'Toast'},
+      {label:'Prime cost', value:LD.prime.toFixed(1)+'%', arrow:LD.prime>60?'↑':'↓', sub:pts(LD.prime-60)+' pts vs 60% target', color:LD.prime<58?'#059669':LD.prime<=62?'#D97706':'#E11D48', source:'MarginEdge + Paylocity'},
+      {label:'COGS', value:LD.cogs.toFixed(1)+'%', arrow:LD.cogs>32?'↑':'↓', sub:pts(LD.cogs-32)+' pts vs 32% target', color:this.costColor(LD.cogs-32,1), source:'MarginEdge'},
+      {label:'Labor', value:LD.labor.toFixed(1)+'%', arrow:LD.labor>D.laborTarget?'↑':'↓', sub:pts(LD.labor-D.laborTarget)+' pts vs '+D.laborTarget+'% target', color:this.costColor(LD.labor-D.laborTarget,1), source:'Paylocity'},
+      {label:'Avg check', value:'$'+D.check.toFixed(2), arrow:D.checkDelta>=0?'↑':'↓', sub:pts(D.checkDelta)+'% vs June', color:D.checkDelta>=0?'#059669':'#D97706', source:'Toast'},
+      {label:'Guests', value:Math.round(D.guests*factor).toLocaleString('en-US'), arrow:D.guestsDelta>=0?'↑':'↓', sub:pts(D.guestsDelta)+'% vs June', color:D.guestsDelta>=0?'#059669':'#D97706', source:'Toast'}
+    ];
+    const maxDp = Math.max(...D.dayparts);
+    const dayparts = D.dayparts.map((p,i)=>({
+      label:this.DAYPARTS[i], width:(p/maxDp*100).toFixed(1)+'%',
+      color: p===maxDp ? '#E8720C' : 'rgba(20,40,75,0.82)',
+      revenue:this.fmt$(Math.round(p/100*LD.revenue*factor/100)*100), pct:p+'% of sales',
+      title:this.DAYPARTS[i]+' · '+this.fmt$(Math.round(p/100*LD.revenue*factor/100)*100)+' · '+p+'% of sales',
+      border: i<D.dayparts.length-1 ? '1px solid #F1F5F9' : 'none'
+    }));
+    const maxMenu = Math.max(...D.menu.map(m=>m.sales));
+    const catStyles = {'Food':{bg:'#ECFDF5',fg:'#047857'}, 'Food Truck':{bg:'#ECFDF5',fg:'#047857'}, 'Draft Beer':{bg:'#FFF7ED',fg:'#C2590A'}, 'Packaged':{bg:'#EFF3F9',fg:'#3A5580'}, 'Merch':{bg:'#F1F5F9',fg:'#475569'}};
+    const menuRows = D.menu.map((m,i)=>({
+      item:m.item, cat:m.cat, catBg:catStyles[m.cat].bg, catColor:catStyles[m.cat].fg,
+      units:Math.round(m.units*factor).toLocaleString('en-US'), sales:this.fmt$(Math.round(m.sales*factor/10)*10),
+      mix:(m.sales/LD.revenue*100).toFixed(1)+'%', mixW:(m.sales/maxMenu*100).toFixed(1)+'%',
+      bg: i%2 ? '#F8FAFC' : '#FFFFFF'
+    }));
+    const serD = win(this.series(di));
+    const sc2 = this.scale(Math.max(...serD));
+    const comboGrid=[]; for(let v=sc2.step; v<=sc2.top; v+=sc2.step) comboGrid.push({label:'$'+v+'k', bottom:(v/sc2.top*100).toFixed(2)+'%'});
+    const comboBars = serD.map((v,i)=>({
+      h:(v/sc2.top*100).toFixed(1)+'%',
+      title:tipDay(i)+' · $'+(v*1000).toLocaleString('en-US', {maximumFractionDigits:0})
+    }));
+    const avgD = serD.reduce((a,b)=>a+b,0)/serD.length;
+    const laborSer = serD.map((v,i)=> Math.min(45, Math.max(20, LD.labor + (avgD-v)/avgD*9 + 0.8*Math.sin(i*2.1))));
+    const laborLine = laborSer.map((p,i)=> (i/(laborSer.length-1)*1000).toFixed(1)+','+(200-p/50*200).toFixed(1)).join(' ');
+    const cbt = s.tt && s.tt.id==='combo' ? s.tt.idx : null;
+    const onComboMove = lineMove('combo', serD.length);
+    const cogsRows = D.cogs.map((c,i)=>({
+      cat:c[0], spend:this.fmt$(Math.round(c[1]*factor/10)*10), pct:(c[1]/LD.revenue*100).toFixed(1)+'%',
+      delta:(c[2]>=0?'+':'')+c[2].toFixed(1)+'%', deltaColor:c[2]<=0?'#059669':c[2]<=4?'#64748B':'#D97706',
+      bg: i%2 ? '#F8FAFC' : '#FFFFFF'
+    }));
+    const locAlerts = D.alerts.map((a,i)=>({dot:a.sev, title:a.title, detail:a.detail, source:a.source, border: i<D.alerts.length-1?'1px solid #F1F5F9':'none'}));
+
+    // ---- Labor & Production ----
+    const isLaborTab = s.opsTab==='labor';
+    const opsTabs = [['labor','Labor'],['prod','Production & Inventory']].map(([k,lab])=>({
+      label:lab, bg: s.opsTab===k?'#14284B':'transparent', color: s.opsTab===k?'#FFFFFF':'#64748B',
+      hoverColor: s.opsTab===k?'#FFFFFF':'#14284B', onClick:()=>this.flash({opsTab:k})
+    }));
+    const fmtH = n => n.toLocaleString('en-US');
+    const laborKpis = [
+      {label:'Labor cost', value:this.fmt$(sc$(218900)), arrow:'↑', sub:'29.5% of net sales', color:'#D97706', source:'Paylocity'},
+      {label:'Scheduled hours', value:fmtH(Math.round(9620*factor)), arrow:'', sub:'Published in Sling', color:'#64748B', source:'Sling'},
+      {label:'Actual hours', value:fmtH(Math.round(9840*factor)), arrow:'↑', sub:'+'+Math.round(220*factor)+' hrs vs schedule', color:'#D97706', source:'Paylocity'},
+      {label:'Overtime hours', value:String(Math.round(214*factor)), arrow:'↑', sub:'2.2% of actual hours', color:'#E11D48', source:'Paylocity'},
+      {label:'Labor % of sales', value:'29.5%', arrow:'↑', sub:'+0.5 pts vs 29% target', color:'#D97706', source:'Toast + Paylocity'},
+      {label:'Headcount', value:'182', arrow:'↑', sub:'+9 vs June (OC ramp)', color:'#64748B', source:'Paylocity'}
+    ];
+    const maxHrs = Math.max(...this.LABOR_HRS.map(h=>Math.max(h.sched,h.actual)));
+    const hourGroups = this.LABOR_HRS.map((h,i)=>{
+      const ss = Math.round(h.sched*factor/10)*10, aa = Math.round(h.actual*factor/10)*10;
+      const v = aa - ss;
+      const vs = v>50*factor ? {bg:'#FFF1F2',fg:'#BE123C'} : v>0 ? {bg:'#FFFBEB',fg:'#B45309'} : {bg:'#ECFDF5',fg:'#047857'};
+      return { name:locShortName(this.LOCS[i].name),
+        varLabel:(v>=0?'+':'')+v+' hrs', varBg:vs.bg, varColor:vs.fg,
+        schedH:(h.sched/maxHrs*100).toFixed(1)+'%', actualH:(h.actual/maxHrs*100).toFixed(1)+'%',
+        hrsLabel:fmtH(ss)+' / '+fmtH(aa),
+        tip:'Sched '+fmtH(ss)+' · Actual '+fmtH(aa)+' · '+(v>=0?'+':'')+v+' hrs',
+        tipOpacity: s.hb&&s.hb.id==='hrs'&&s.hb.idx===i ? 1 : 0,
+        onEnter: ()=>this.setState({hb:{id:'hrs',idx:i}}) };
+    });
+    const lIdx = s.laborLoc==='all' ? null : +s.laborLoc;
+    const laborLocTabs = [['all','All']].concat(this.LOCS.map((l,i)=>[String(i), locShortName(l.name)])).map(([k,lab])=>({
+      label:lab, bg: s.laborLoc===k?'#14284B':'transparent', color: s.laborLoc===k?'#FFFFFF':'#64748B',
+      hoverColor: s.laborLoc===k?'#FFFFFF':'#14284B', onClick:()=>this.setState({laborLoc:k})
+    }));
+    const ltBase = lIdx==null ? this.COMPANY.labor : this.LOCS[lIdx].labor;
+    const ltTarget = lIdx==null ? 29 : 30;
+    const ltSer = win(this.series(lIdx));
+    const ltAvg = ltSer.reduce((a,b)=>a+b,0)/ltSer.length;
+    const ltPts = ltSer.map((v,i)=> Math.min(39.5, Math.max(20.5, ltBase + (ltAvg-v)/ltAvg*7 + 0.7*Math.sin(i*2.1))));
+    const laborGrid = [25,30,35,40].map(v=>({label:v+'%', bottom:((v-20)/20*100).toFixed(1)+'%'}));
+    const laborTrendLine = ltPts.map((p,i)=> (i/(ltPts.length-1)*1000).toFixed(1)+','+(200-(p-20)/20*200).toFixed(1)).join(' ');
+    const ltt = s.tt && s.tt.id==='lt' ? s.tt.idx : null;
+    const onLtMove = lineMove('lt', ltPts.length);
+    const otRows = this.OT_ROWS.map((r,i)=>({
+      name:r[0], loc:locShortName(this.LOCS[r[1]].name), role:r[2],
+      sched:r[3].toFixed(1), actual:r[4].toFixed(1), ot:r[5].toFixed(1),
+      otColor: r[5]>0?'#BE123C':'#334155',
+      badge: r[5]>0?'OT +'+r[5].toFixed(1)+'h':'At cap',
+      badgeBg: r[5]>0?'#FFF1F2':'#FFFBEB', badgeColor: r[5]>0?'#BE123C':'#B45309',
+      bg: i%2 ? '#F8FAFC' : '#FFFFFF'
+    }));
+    const prodKpis = [
+      {label:'Produced', value:Math.round(1480*factor).toLocaleString('en-US')+' BBL', arrow:'↑', sub:'+4.3% vs plan', color:'#059669', source:'Ekos'},
+      {label:'Batches in progress', value:'8', arrow:'', sub:'3 ready by Jul 24', color:'#64748B', source:'Ekos'},
+      {label:'Kegs on hand', value:fmtH(1142), arrow:'↓', sub:'1 SKU below par', color:'#D97706', source:'Ekos'},
+      {label:'Raw materials value', value:'$186,400', arrow:'↑', sub:'+$12k malt receipt Jul 18', color:'#64748B', source:'Ekos'},
+      {label:'Tanks in use', value:'8 / 14', arrow:'', sub:'2 FVs open next week', color:'#64748B', source:'Ekos'}
+    ];
+    const maxBbl = Math.max(...this.PROD_BEERS.map(b=>b[1]));
+    const beerBars = this.PROD_BEERS.map((b,i)=>({
+      name:b[0], bbl:Math.round(b[1]*factor)+' BBL', width:(b[1]/maxBbl*100).toFixed(1)+'%',
+      title:b[0]+' · '+Math.round(b[1]*factor)+' BBL produced',
+      color: i===0 ? '#E8720C' : 'rgba(20,40,75,0.82)',
+      border: i<this.PROD_BEERS.length-1?'1px solid #F1F5F9':'none'
+    }));
+    const stageStyles = {'Brewing':{bg:'#F1F5F9',fg:'#475569'},'Fermentation':{bg:'#EFF3F9',fg:'#3A5580'},'Conditioning':{bg:'#FFFBEB',fg:'#B45309'},'Packaging':{bg:'#FFF7ED',fg:'#C2590A'}};
+    const batchRows = this.BATCHES.map((b,i)=>({
+      id:b[0], beer:b[1], stage:b[2], tank:b[3], start:b[4], ready:b[5], pct:b[6]+'%',
+      stageBg:stageStyles[b[2]].bg, stageColor:stageStyles[b[2]].fg,
+      bg: i%2 ? '#F8FAFC' : '#FFFFFF'
+    }));
+    const fgMax = Math.max(...this.FG_PAR.map(f=>Math.max(f[1],f[2])))*1.08;
+    const fgBars = this.FG_PAR.map((f,i)=>{
+      const ratio = f[1]/f[2];
+      const color = ratio>=1 ? 'rgba(20,40,75,0.82)' : ratio>=0.8 ? '#D97706' : '#E11D48';
+      return { name:f[0], onHand:f[1], par:f[2], title:f[0]+' · '+f[1]+' kegs on hand vs par '+f[2],
+        width:(f[1]/fgMax*100).toFixed(1)+'%', parLeft:(f[2]/fgMax*100).toFixed(1)+'%',
+        color, valColor: ratio>=1 ? '#14284B' : ratio>=0.8 ? '#B45309' : '#BE123C',
+        border: i<this.FG_PAR.length-1?'1px solid #F1F5F9':'none' };
+    });
+
+    // ---- Reports ----
+    const RP_CARDS = [
+      {t:'Prime Cost Command Center', live:true, report:'prime', icon:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 16.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zM12 12h.01',
+        d:'COGS, labor, and sales in one view against your 60% target. See which lever — food/bev cost or labor — is driving prime cost at each location, day by day.'},
+      {t:'True Pint Profitability', live:true, report:'pint', icon:'M8 3h8l-1 18H9zM7.5 8.5h9',
+        d:'Real margin per beer per pour — production cost from Ekos against pour price from Toast. Know which taps earn their keg space.'},
+      {t:'Sales per Labor Hour', icon:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 8v4l2.5 1.5',
+        d:'Revenue per labor hour by daypart and location. Spot the shifts where staffing outruns sales.'},
+      {t:'Menu Engineering Matrix', icon:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
+        d:'Stars, plowhorses, puzzles, and dogs by item and location. Pairs Toast product mix with MarginEdge plate costs.'},
+      {t:'Location Scorecard', icon:'M9 3h6v4H9zM5 5h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1M9 12h6M9 16h4',
+        d:'All four locations normalized onto one comparable page — revenue, prime, comps, and guest trends side by side.'},
+      {t:'13-Week Cash Flow Forecast', icon:'M3 6h18v12H3zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M6 9h.01M18 15h.01',
+        d:'Committed outflows from QuickBooks and MarginEdge against projected inflows from Toast trends.'},
+      {t:'Keg Yield & Pour-Cost Variance', icon:'M6 4h12v16H6zM6 9h12M6 15h12',
+        d:'Theoretical vs actual yield per keg by beer and location. Finds the foam, the waste, and the unrung pints.'},
+      {t:'Vendor Spend & Price Inflation', icon:'M3 17l6-6 4 4 8-8M15 7h6v6',
+        d:'Unit-price trends on key inputs by vendor from MarginEdge invoices. See who is raising prices before it hits margin.'}
+    ];
+    const reportCards = RP_CARDS.map(c=>({
+      title:c.t, desc:c.d, icon:c.icon, featured:!!c.live, soon:!c.live,
+      cta: c.live ? 'Open report →' : 'Coming soon',
+      ctaColor: c.live ? '#E8720C' : '#94A3B8',
+      border: c.live ? '1.5px solid #E8720C' : '1px solid #E2E8F0',
+      onOpen: c.live ? ()=>this.flash({reportView:c.report}) : ()=>this.flash({reportView:'soon', soonTitle:c.t, soonDesc:c.d})
+    }));
+    const rpScopeIdx = s.rpScope==='all' ? null : +s.rpScope;
+    const RS = this.rpSeries(rpScopeIdx, s.rpPeriod);
+    const rpFactor = s.rpPeriod==='13w' ? this.rpSeries(null,'13w').sales.reduce((a,b)=>a+b,0)/fullSum : 1;
+    const rpPeriodTabs = [['mtd','Jul 2026 — MTD'],['13w','Last 13 weeks'],['21d','Last 21 days']].map(([k,lab])=>({
+      label:lab, bg:s.rpPeriod===k?'#14284B':'transparent', color:s.rpPeriod===k?'#FFFFFF':'#64748B',
+      hoverColor:s.rpPeriod===k?'#FFFFFF':'#14284B', onClick:()=>this.flash({rpPeriod:k})
+    }));
+    const rpScopeTabs = [['all','All locations']].concat(this.LOCS.map((l,i)=>[String(i), locShortName(l.name)])).map(([k,lab])=>({
+      label:lab, bg:s.rpScope===k?'#14284B':'transparent', color:s.rpScope===k?'#FFFFFF':'#64748B',
+      hoverColor:s.rpScope===k?'#FFFFFF':'#14284B', onClick:()=>this.flash({rpScope:k})
+    }));
+    const RSc = rpScopeIdx==null ? {cogs:this.COMPANY.cogs, labor:this.COMPANY.labor, prime:this.COMPANY.prime, rev:this.COMPANY.revenue} :
+      {cogs:this.LOCS[rpScopeIdx].cogs, labor:this.LOCS[rpScopeIdx].labor, prime:this.LOCS[rpScopeIdx].prime, rev:this.LOCS[rpScopeIdx].revenue};
+    const rpDelta = RSc.prime-60;
+    const rpKpis = [
+      {label:'Prime cost', value:RSc.prime.toFixed(1)+'%', sub:'target ≤60%', color:RSc.prime<58?'#059669':RSc.prime<=62?'#D97706':'#E11D48', source:'MarginEdge + Paylocity'},
+      {label:'COGS', value:RSc.cogs.toFixed(1)+'%', sub:'of net sales', color:'#64748B', source:'MarginEdge'},
+      {label:'Labor', value:RSc.labor.toFixed(1)+'%', sub:'of net sales', color:'#64748B', source:'Sling + Paylocity'},
+      {label:'Net sales', value:'$'+Math.round(RSc.rev*rpFactor/1000)+'K', sub:s.rpPeriod==='13w'?'last 13 weeks':'Jul 1–21', color:'#64748B', source:'Toast'},
+      {label:'Δ vs target', value:(rpDelta>=0?'+':'')+rpDelta.toFixed(1)+' pts', sub:'prime vs 60%', color:rpDelta<=0?'#059669':rpDelta<=2?'#D97706':'#E11D48', source:'QuickBooks'}
+    ];
+    // Hero A — stacked area
+    const rpN = RS.sales.length;
+    const rpx = i => (i/(rpN-1)*1000);
+    const rpy = p => (200 - p/70*200);
+    const cogsPts = RS.cogsSer.map((c,i)=> rpx(i).toFixed(1)+' '+rpy(c).toFixed(1));
+    const primePts = RS.primeSer.map((p,i)=> rpx(i).toFixed(1)+' '+rpy(p).toFixed(1));
+    const rpCogsArea = 'M0 200 L'+cogsPts.join(' L')+' L1000 200 Z';
+    const rpLaborArea = 'M'+cogsPts.join(' L')+' L'+primePts.slice().reverse().join(' L')+' Z';
+    const rpPrimeLine = 'M'+primePts.join(' L');
+    const overPts = RS.primeSer.map((p,i)=> rpx(i).toFixed(1)+' '+rpy(Math.max(p,60)).toFixed(1));
+    const rpOverArea = 'M'+overPts.join(' L')+' L1000 '+rpy(60).toFixed(1)+' L0 '+rpy(60).toFixed(1)+' Z';
+    const avgC2 = RS.cogsSer.reduce((a,b)=>a+b,0)/rpN, avgL2 = RS.laborSer.reduce((a,b)=>a+b,0)/rpN;
+    const rpXLabels = Array.from({length:6},(_,i)=> RS.labels[Math.round(i*(rpN-1)/5)]);
+    const rpt = s.tt && s.tt.id==='rp' ? s.tt.idx : null;
+    const onRpMove = lineMove('rp', rpN);
+    // Hero B — cost-mix map (x 27–37, y 23–35)
+    const bubX = v => ((v-27)/10*100), bubY = v => ((v-23)/12*100);
+    const LOC_COLORS = ['#14284B','#E8720C','#5B7DB1','#94A3B8'];
+    const lT = (pos,sz)=>{ const o=Math.round(sz/2)+5;
+      return pos==='below' ? 'translate(-50%, '+o+'px)'
+        : pos==='above' ? 'translate(-50%, calc(-100% - '+o+'px))'
+        : pos==='left' ? 'translate(calc(-100% - '+o+'px), -50%)'
+        : 'translate('+o+'px, -50%)'; };
+    const allPos = ['below','left','right','above'];
+    let rpBubbles;
+    if (rpScopeIdx==null) {
+      rpBubbles = this.LOCS.map((l,i)=>({ name:locShortName(l.name), color:LOC_COLORS[i],
+        left:bubX(l.cogs).toFixed(1)+'%', bottom:bubY(l.labor).toFixed(1)+'%',
+        size:Math.round(Math.sqrt(l.revenue/1000)*2.5),
+        lTransform:lT(allPos[i], Math.sqrt(l.revenue/1000)*2.5),
+        tip:locShortName(l.name)+' · '+this.fmt$(sc$(l.revenue))+' · COGS '+l.cogs+'% · Labor '+l.labor+'% · Prime '+l.prime+'%',
+        tipOpacity: s.hb&&s.hb.id==='bub'&&s.hb.idx===i?1:0, onEnter:()=>this.setState({hb:{id:'bub',idx:i}}) }));
+    } else {
+      const l = this.LOCS[rpScopeIdx], wk = ['Wk of Jun 22','Wk of Jun 29','Wk of Jul 6','Wk of Jul 13'];
+      rpBubbles = wk.map((w,i)=>{ const c = l.cogs+1.0*Math.sin(i*1.9+rpScopeIdx), lb = l.labor+1.2*Math.cos(i*1.3+rpScopeIdx);
+        const wrev = Math.round(l.revenue/3*(1+0.08*Math.sin(i*2.2)));
+        return { name:w, color:LOC_COLORS[rpScopeIdx],
+          left:bubX(c).toFixed(1)+'%', bottom:bubY(lb).toFixed(1)+'%', size:Math.round(Math.sqrt(wrev/1000)*2.5),
+          lTransform:lT(i%2 ? 'above' : 'below', Math.sqrt(wrev/1000)*2.5),
+          tip:w+' · '+this.fmt$(wrev)+' · COGS '+c.toFixed(1)+'% · Labor '+lb.toFixed(1)+'% · Prime '+(c+lb).toFixed(1)+'%',
+          tipOpacity: s.hb&&s.hb.id==='bub'&&s.hb.idx===i?1:0, onEnter:()=>this.setState({hb:{id:'bub',idx:i}}) };
+      });
+    }
+    const rpBubLegend = rpScopeIdx==null
+      ? this.LOCS.map((l,i)=>({label:locShortName(l.name), color:LOC_COLORS[i]}))
+      : [{label:locShortName(this.LOCS[rpScopeIdx].name)+' · weekly, last 4 weeks', color:LOC_COLORS[rpScopeIdx]}];
+    const rpBubGridX = [28,30,32,34,36].map(v=>({label:v+'%', left:bubX(v).toFixed(1)+'%'}));
+    const rpBubGridY = [24,26,28,30,32,34].map(v=>({label:v+'%', bottom:bubY(v).toFixed(1)+'%'}));
+    // Decomposition
+    const rpDecomp = this.LOCS.map((l,i)=>({ name:locShortName(l.name), prime:l.prime.toFixed(1)+'%', p:l.prime,
+      cogsW:(l.cogs/70*100).toFixed(1)+'%', laborW:(l.labor/70*100).toFixed(1)+'%',
+      cogs:l.cogs+'%', labor:l.labor+'%',
+      title:locShortName(l.name)+' · COGS '+l.cogs+'% + Labor '+l.labor+'% = '+l.prime+'%' })).sort((a,b)=> b.p-a.p);
+    // Table
+    const primeSpark = i => { const p = this.rpSeries(i,'21d').primeSer;
+      return p.map((v,j)=> (j/(p.length-1)*100).toFixed(1)+','+(26-((v-50)/20)*22).toFixed(1)).join(' '); };
+    const miniLine = i => { const p = this.rpSeries(i,'21d').primeSer;
+      return p.map((v,j)=> (j/(p.length-1)*300).toFixed(1)+','+(60-((v-50)/20)*60).toFixed(1)).join(' '); };
+    const rowVals = this.LOCS.map((l,i)=>{ const sales=l.revenue*rpFactor;
+      return { i, loc:locShortName(l.name), type:l.type, sales, cogsD:sales*l.cogs/100, cogs:l.cogs, laborD:sales*l.labor/100, labor:l.labor, primeD:sales*l.prime/100, prime:l.prime, delta:l.prime-60 };
+    });
+    const sk = s.rpSortKey, sd = s.rpSortDir;
+    rowVals.sort((a,b)=> (typeof a[sk]==='string' ? a[sk].localeCompare(b[sk]) : a[sk]-b[sk])*sd);
+    const rpCols = [['loc','Location','left'],['sales','Net Sales','right'],['cogsD','COGS $','right'],['cogs','COGS %','right'],['laborD','Labor $','right'],['labor','Labor %','right'],['primeD','Prime $','right'],['prime','Prime %','right'],['delta','Δ vs Target','right'],[null,'21-day trend','right']].map(([k,lab,al])=>({
+      label:lab, align:al, arrow: k===sk ? (sd===1?' ↑':' ↓') : '',
+      cursor: k?'pointer':'default',
+      onSort: k ? ()=>this.setState({rpSortKey:k, rpSortDir: this.state.rpSortKey===k ? -this.state.rpSortDir : 1}) : ()=>{}
+    }));
+    const dpShare = [0.24,0.18,0.44,0.14], dpOff = [2.5,0.5,-2.0,4.5];
+    const rpRows = rowVals.map((r,ri)=>{ const ps=this.primeStyle(r.prime); const exp = s.rpExpand===r.i;
+      const det = this.LOC_DETAIL[r.i];
+      return { loc:r.loc, type:r.type, sales:this.fmt$(Math.round(r.sales/100)*100), cogsD:this.fmt$(Math.round(r.cogsD/100)*100), cogs:r.cogs.toFixed(1)+'%',
+        laborD:this.fmt$(Math.round(r.laborD/100)*100), labor:r.labor.toFixed(1)+'%', primeD:this.fmt$(Math.round(r.primeD/100)*100),
+        prime:r.prime.toFixed(1)+'%', pillBg:ps.bg, pillColor:ps.fg,
+        delta:(r.delta>=0?'+':'')+r.delta.toFixed(1), deltaColor:r.delta<=0?'#059669':r.delta<=2?'#B45309':'#BE123C',
+        spark:primeSpark(r.i), bg: exp ? '#FFF7ED' : (ri%2 ? '#F8FAFC' : '#FFFFFF'),
+        chev: exp ? '▾' : '▸',
+        onExpand: ()=>this.setState({rpExpand: this.state.rpExpand===r.i ? null : r.i}),
+        detailDisplay: exp ? 'table-row' : 'none',
+        miniLine:miniLine(r.i),
+        cogsCats: det.cogs.slice(0,5).map(c=>({cat:c[0], spend:this.fmt$(c[1]), pct:(c[1]/this.LOCS[r.i].revenue*100).toFixed(1)+'%'})),
+        dayparts: this.DAYPARTS.map((d,di)=>({label:d, hrs:Math.round(this.LABOR_HRS[r.i].actual*dpShare[di]).toLocaleString('en-US'), pct:(this.LOCS[r.i].labor+dpOff[di]).toFixed(1)+'%'}))
+      };
+    });
+    const backToReports = ()=>this.flash({reportView:'index', rpExpand:null, ppExpand:null});
+
+    // ---- True Pint Profitability ----
+    const ppFactor = s.ppPeriod==='13w' ? 13/3 : 1; // MTD≈3 weeks
+    const ppScopeIdx = s.ppScope==='all' ? null : +s.ppScope;
+    // per-taproom pour-price offsets and volume shares (sum≈1)
+    const priceOff = [-0.25, 0.25, 0.0, -0.10];
+    const volShare = [0.36, 0.26, 0.22, 0.16];
+    const ppBase = this.PINT.map(b=>{
+      const pours = ppScopeIdx==null ? b.pours : Math.round(b.pours*volShare[ppScopeIdx]);
+      const price = ppScopeIdx==null ? b.price : +(b.price+priceOff[ppScopeIdx]).toFixed(2);
+      const margin = +(price-b.cost).toFixed(2);
+      const pp = Math.round(pours*ppFactor);
+      return Object.assign({}, b, {price, margin, marginPct:margin/price*100, poursP:pp, gp:margin*pp});
+    });
+    const ppTotalGP = ppBase.reduce((a,b)=>a+b.gp,0);
+    const ppTotalPours = ppBase.reduce((a,b)=>a+b.poursP,0);
+    const bestMargin = ppBase.slice().sort((a,b)=>b.margin-a.margin)[0];
+    const bestGP = ppBase.slice().sort((a,b)=>b.gp-a.gp)[0];
+    const fmtK = n => n>=1000 ? '$'+(n/1000).toFixed(1)+'K' : '$'+Math.round(n);
+    const ppPeriodTabs = [['mtd','Jul 2026 — MTD'],['13w','Last 13 weeks']].map(([k,lab])=>({
+      label:lab, bg:s.ppPeriod===k?'#14284B':'transparent', color:s.ppPeriod===k?'#FFFFFF':'#64748B',
+      hoverColor:s.ppPeriod===k?'#FFFFFF':'#14284B', onClick:()=>this.flash({ppPeriod:k})
+    }));
+    const ppScopeTabs = [['all','All taprooms']].concat(this.LOCS.map((l,i)=>[String(i), locShortName(l.name)])).map(([k,lab])=>({
+      label:lab, bg:s.ppScope===k?'#14284B':'transparent', color:s.ppScope===k?'#FFFFFF':'#64748B',
+      hoverColor:s.ppScope===k?'#FFFFFF':'#14284B', onClick:()=>this.flash({ppScope:k})
+    }));
+    const ppKpis = [
+      {label:'Draft gross profit', value:fmtK(ppTotalGP), sub:s.ppPeriod==='13w'?'last 13 weeks':'MTD · taproom draft', color:'#059669', source:'Toast + Ekos'},
+      {label:'Avg margin / pour', value:'$'+(ppTotalGP/ppTotalPours).toFixed(2), sub:'weighted by volume', color:'#14284B', source:'Toast + MarginEdge'},
+      {label:'Best margin beer', value:bestMargin.beer, sub:'$'+bestMargin.margin.toFixed(2)+'/pour · '+bestMargin.marginPct.toFixed(1)+'%', color:'#14284B', source:'MarginEdge'},
+      {label:'Highest total GP', value:bestGP.beer, sub:fmtK(bestGP.gp)+' · '+(bestGP.gp/ppTotalGP*100).toFixed(0)+'% of draft GP', color:'#C2590A', source:'Toast'},
+      {label:'Pours sold', value:ppTotalPours.toLocaleString('en-US'), sub:s.ppPeriod==='13w'?'16oz · 13 wks':'16oz · MTD', color:'#64748B', source:'Toast'}
+    ];
+    // Hero A — price bars split cost+margin, sorted by margin$ desc
+    const ppMaxPrice = Math.max(...ppBase.map(b=>b.price));
+    const heroBars = ppBase.slice().sort((a,b)=>b.margin-a.margin).map(b=>({
+      beer:b.beer, price:'$'+b.price.toFixed(2), cost:'$'+b.cost.toFixed(2), margin:'$'+b.margin.toFixed(2),
+      marginPct:b.marginPct.toFixed(1)+'%',
+      costW:(b.cost/ppMaxPrice*100).toFixed(1)+'%', marginW:(b.margin/ppMaxPrice*100).toFixed(1)+'%',
+      title:b.beer+' · price $'+b.price.toFixed(2)+' = cost $'+b.cost.toFixed(2)+' + margin $'+b.margin.toFixed(2)+' ('+b.marginPct.toFixed(1)+'%)'
+    }));
+    const ppAxisTicks = [0,2,4,6,8].filter(v=>v<=ppMaxPrice).map(v=>({label:'$'+v, left:(v/ppMaxPrice*100).toFixed(1)+'%'}));
+    // Hero B — quadrant: X=margin/pour (3.5–8), Y=pours
+    const BEER_COLORS = ['#E8720C','#5B7DB1','#14284B','#8B5CF6','#0EA5E9','#F59E0B'];
+    const bcOf = beer => BEER_COLORS[this.PINT.findIndex(x=>x.beer===beer)];
+    const mgVals = ppBase.map(b=>b.margin), pvVals = ppBase.map(b=>b.poursP);
+    const median = arr => { const a=arr.slice().sort((x,y)=>x-y), m=Math.floor(a.length/2); return a.length%2 ? a[m] : (a[m-1]+a[m])/2; };
+    const mgMed = median(mgVals), pvMed = median(pvVals);
+    const qxMin=4.8, qxMax=7.6, qyMin=0, qyMax=Math.max(...pvVals)*1.12;
+    const qX = v => ((v-qxMin)/(qxMax-qxMin)*100);
+    const qY = v => (v/qyMax*100);
+    const maxGP2 = Math.max(...ppBase.map(b=>b.gp));
+    const quadBubbles = ppBase.map((b,i)=>({
+      beer:b.beer, color:bcOf(b.beer),
+      left:qX(b.margin).toFixed(1)+'%', bottom:qY(b.poursP).toFixed(1)+'%',
+      size:Math.round(14+Math.sqrt(b.gp/maxGP2)*34),
+      tip:b.beer+' · $'+b.margin.toFixed(2)+'/pour · '+b.poursP.toLocaleString('en-US')+' pours · GP '+fmtK(b.gp),
+      tipOpacity: s.hb&&s.hb.id==='pp'&&s.hb.idx===i?1:0, onEnter:()=>this.setState({hb:{id:'pp',idx:i}})
+    }));
+    const quadLegend = ppBase.map(b=>({label:b.beer, color:bcOf(b.beer)}));
+    const mgMedLeft = qX(mgMed).toFixed(1)+'%', pvMedBottom = qY(pvMed).toFixed(1)+'%';
+    const ppXTicks = [5,5.5,6,6.5,7,7.5].filter(v=>v>=qxMin&&v<=qxMax).map(v=>({label:'$'+v.toFixed(v%1?2:0), left:qX(v).toFixed(1)+'%'}));
+    const ppYTicks = [2000,4000,6000,8000].filter(v=>v<=qyMax).map(v=>({label:(v/1000)+'k', bottom:qY(v).toFixed(1)+'%'}));
+    // Table
+    const ppSpark = beer => { const seed=this.PINT.findIndex(x=>x.beer===beer);
+      return Array.from({length:21},(_,j)=>{ const w = 1+0.4*Math.sin(j*0.9+seed)+(j>4&&(j%7===5||j%7===6)?0.7:0);
+        return (j/20*100).toFixed(1)+','+(26-Math.min(1,w/2.2)*22).toFixed(1); }).join(' '); };
+    const ppK = s.ppSortKey, ppD = s.ppSortDir;
+    const ppRowsRaw = ppBase.map(b=>({ b, gp:b.gp, pours:b.poursP, margin:b.margin, marginPct:b.marginPct, cost:b.cost, price:b.price, abv:b.abv, beer:b.beer, style:b.style }));
+    ppRowsRaw.sort((a,b)=> (typeof a[ppK]==='string' ? a[ppK].localeCompare(b[ppK]) : a[ppK]-b[ppK])*ppD);
+    const ppCols = [['beer','Beer','left'],['style','Style','left'],['abv','ABV','right'],['cost','Cost/pour','right'],['price','Pour price','right'],['margin','Margin/pour','right'],['marginPct','Margin %','right'],['pours','Pours','right'],['gp','Total GP','right'],[null,'21-day pours','right']].map(([k,lab,al])=>({
+      label:lab, align:al, arrow: k===ppK ? (ppD===1?' ↑':' ↓') : '', cursor:k?'pointer':'default',
+      onSort: k ? ()=>this.setState({ppSortKey:k, ppSortDir: this.state.ppSortKey===k ? -this.state.ppSortDir : (k==='beer'||k==='style'?1:-1)}) : ()=>{}
+    }));
+    const ppRows = ppRowsRaw.map((r,ri)=>{ const b=r.b; const exp=s.ppExpand===b.beer;
+      const kegRatio=b.kegs/b.par; const kegColor= kegRatio>=1?'#047857':kegRatio>=0.8?'#B45309':'#BE123C';
+      return { beer:b.beer, style:b.style, abv:b.abv.toFixed(1)+'%', cost:'$'+b.cost.toFixed(2), price:'$'+b.price.toFixed(2),
+        margin:'$'+b.margin.toFixed(2), marginPct:b.marginPct.toFixed(1)+'%', pours:b.poursP.toLocaleString('en-US'), gp:fmtK(b.gp),
+        low:b.low, dot:bcOf(b.beer), spark:ppSpark(b.beer), bg: exp ? '#FFF7ED' : (ri%2?'#F8FAFC':'#FFFFFF'), chev: exp?'▾':'▸',
+        onExpand:()=>this.setState({ppExpand: this.state.ppExpand===b.beer ? null : b.beer}),
+        detailDisplay: exp?'table-row':'none',
+        byTaproom: this.LOCS.map((l,li)=>({ loc:locShortName(l.name), price:'$'+(b.price+priceOff[li]).toFixed(2), pours:Math.round(b.pours*volShare[li]*ppFactor).toLocaleString('en-US') })),
+        costRows:[
+          {k:'Ingredients', v:'$'+b.ingr.toFixed(2), bt:'none', fw:'400', fc:'#475569'},
+          {k:'Packaging / keg', v:'$'+b.pkg.toFixed(2), bt:'none', fw:'400', fc:'#475569'},
+          {k:'Production ($'+b.brewBBL+'/BBL ÷ 248)', v:'$'+(b.brewBBL/248).toFixed(2), bt:'none', fw:'400', fc:'#475569'},
+          {k:'Cost / pour', v:'$'+b.cost.toFixed(2), bt:'1px solid #E2E8F0', fw:'700', fc:'#14284B', mt:'2px'} ],
+        kegs:b.kegs, par:b.par, kegColor, kegPct:Math.min(100,kegRatio*100).toFixed(0)+'%', parLeft:Math.min(100,(b.par/(Math.max(b.kegs,b.par)*1.1))*100).toFixed(0)+'%',
+        kegW:Math.min(100,(b.kegs/(Math.max(b.kegs,b.par)*1.1))*100).toFixed(0)+'%',
+        kegNote: kegRatio>=1 ? 'At/above par' : 'Below par — '+(b.par-b.kegs)+' kegs short', batches:b.batches };
+    });
+    const ppMed = { onPpMed:true };
+
+    // ---- Sync Health ----
+    const pill = st => ({Success:{bg:'#ECFDF5',fg:'#047857'},Warning:{bg:'#FFFBEB',fg:'#B45309'},Failed:{bg:'#FFF1F2',fg:'#BE123C'},'Not configured':{bg:'#F1F5F9',fg:'#64748B'}})[st];
+    const syncKpis = [
+      {label:'Sources healthy', value:'5 / 6', sub:'Ekos not configured', color:'#64748B'},
+      {label:'Rows loaded (last run)', value:'214,760', sub:'+3.1% vs 7-day avg', color:'#059669'},
+      {label:'Run duration', value:'12m 38s', sub:'+4m 28s vs avg (Paylocity retry)', color:'#D97706'},
+      {label:'Last run', value:'Today 4:12 AM', sub:'Run #412 · nightly cron', color:'#64748B'},
+      {label:'Next scheduled run', value:'Tonight 4:00 AM', sub:'America/Los_Angeles', color:'#64748B'}
+    ];
+    const SRC = [
+      ['Toast','Sales','Success','58,400','2m 04s','Today 4:03 AM','Nightly S3 export'],
+      ['QuickBooks Online','Financials','Success','12,840','1m 12s','Today 4:01 AM','OAuth poll'],
+      ['MarginEdge','Food cost','Success','9,318','58s','Today 4:04 AM','REST poll'],
+      ['Sling','Scheduling','Success','21,402','47s','Today 4:05 AM','API key pull'],
+      ['Paylocity','Payroll','Warning','112,800','6m 21s','Today 4:12 AM','CDC'],
+      ['Ekos','Production','Not configured','—','—','—','Manual CSV (planned)']
+    ];
+    const sourceRows = SRC.map((r,i)=>{ const p=pill(r[2]); return {
+      name:r[0], domain:r[1], status:r[2], rows:r[3], duration:r[4], lastSuccess:r[5], method:r[6],
+      pillBg:p.bg, pillColor:p.fg, bg: i%2 ? '#F8FAFC' : '#FFFFFF'
+    };});
+    const RUNS = [
+      ['Jul 16','Success',482,'8m 02s'],['Jul 17','Success',464,'7m 44s'],['Jul 18','Warning',672,'11m 12s'],
+      ['Jul 19','Success',478,'7m 58s'],['Jul 20','Failed',201,'3m 21s'],['Jul 21','Success',490,'8m 10s'],
+      ['Jul 22','Warning',758,'12m 38s']
+    ];
+    const runMax = Math.max(...RUNS.map(r=>r[2]));
+    const runColors = {Success:'rgba(20,40,75,0.82)', Warning:'#D97706', Failed:'#E11D48'};
+    const runHistory = RUNS.map((r,i)=>{ const p=pill(r[1]); return {
+      date:r[0], status:r[1], duration:r[3], pillBg:p.bg, pillColor:p.fg,
+      width:(r[2]/runMax*100).toFixed(1)+'%', color:runColors[r[1]],
+      border: i<RUNS.length-1?'1px solid #F1F5F9':'none'
+    };});
+    const srcColors = {cron:'#93A3BE', qbo:'#FCA55F', toast:'#FCA55F', sling:'#FCA55F', paylocity:'#FBBF24', marginedge:'#FCA55F', warehouse:'#93A3BE', ekos:'#7C8DAB', resend:'#6EE7B7'};
+    const LOG = [
+      ['04:00:03','cron','nightly run #412 started (America/Los_Angeles)'],
+      ['04:00:04','qbo','worker started — OAuth token refreshed'],
+      ['04:01:12','toast','S3 export fetched · 4 files · 58,400 rows'],
+      ['04:01:58','qbo','12,840 rows upserted to warehouse'],
+      ['04:02:31','sling','shifts + timesheets pulled · 21,402 rows'],
+      ['04:03:40','paylocity','429 rate limit — backing off 60s'],
+      ['04:04:47','marginedge','invoices polled · 9,318 rows'],
+      ['04:05:41','paylocity','retry 1 — resumed at page 38'],
+      ['04:11:52','paylocity','112,800 rows loaded · 6m 21s total'],
+      ['04:12:20','warehouse','nightly rollups refreshed (Postgres / Railway)'],
+      ['04:12:38','ekos','skipped — source not configured'],
+      ['04:12:41','resend','morning digest sent to ops@hangar24.com']
+    ];
+    const logRows = LOG.map(l=>({t:l[0], src:l[1], msg:l[2], srcColor:srcColors[l[1]]||'#93A3BE'}));
+    const sourceToggles = SRC.map((r,i)=>{ const on = r[2]!=='Not configured'; return {
+      name:r[0], method:r[6], toggleBg: on?'#059669':'#CBD5E1', knobLeft: on?'16px':'2px',
+      note: on?'':'sales-gated', noteColor:'#B45309',
+      border: i<SRC.length-1?'1px solid #F1F5F9':'none'
+    };});
+
+    return {
+      isReports:s.view==='reports',
+      isReportIndex:s.view==='reports'&&s.reportView==='index',
+      isReportPrime:s.view==='reports'&&s.reportView==='prime',
+      isReportPint:s.view==='reports'&&s.reportView==='pint',
+      isReportSoon:s.view==='reports'&&s.reportView==='soon',
+      ppPeriodTabs, ppScopeTabs, ppKpis, heroBars, ppAxisTicks,
+      quadBubbles, quadLegend, ppXTicks, ppYTicks, mgMedLeft, pvMedBottom,
+      ppCols, ppRows,
+      reportCards, soonTitle:s.soonTitle, soonDesc:s.soonDesc, backToReports,
+      rpPeriodTabs, rpScopeTabs, rpKpis,
+      rpCogsArea, rpLaborArea, rpPrimeLine, rpOverArea, rpXLabels,
+      rpTargetBottom:(60/70*100).toFixed(1)+'%',
+      rpCogsLabelBottom:(avgC2/2/70*100).toFixed(1)+'%',
+      rpLaborLabelBottom:((avgC2+avgL2/2)/70*100).toFixed(1)+'%',
+      rpScopeName: rpScopeIdx==null ? 'All locations (company)' : locShortName(this.LOCS[rpScopeIdx].name),
+      onRpMove, rpTipShow:rpt!=null,
+      rpTipLeft: rpt!=null?(rpt/(rpN-1)*100).toFixed(2)+'%':'0%',
+      rpTipBottom: rpt!=null?(RS.primeSer[rpt]/70*100).toFixed(2)+'%':'0%',
+      rpTipTitle: rpt!=null? RS.labels[rpt]+' · '+this.fmt$(Math.round(RS.sales[rpt]*1000)):'',
+      rpTipBody: rpt!=null? 'Prime '+RS.primeSer[rpt].toFixed(1)+'% = COGS '+RS.cogsSer[rpt].toFixed(1)+'% + Labor '+RS.laborSer[rpt].toFixed(1)+'%':'',
+      rpBubbles, rpBubLegend, rpBubGridX, rpBubGridY, rpDecomp, rpCols, rpRows,
+      syncKpis, sourceRows, runHistory, logRows, sourceToggles, isSync:s.view==='sync',
+      opsTabs, isLaborTab, isProdTab:!isLaborTab,
+      opsTabHint: isLaborTab ? 'Sources: Sling (schedules) + Paylocity (payroll)' : 'Source: Ekos · all production at Redlands',
+      laborKpis, hourGroups, laborLocTabs, laborGrid, laborTrendLine,
+      laborTrendTargetBottom:((ltTarget-20)/20*100).toFixed(1)+'%', laborTrendTargetLabel:ltTarget+'%',
+      laborTrendScope: lIdx==null ? 'All locations (company)' : locShortName(this.LOCS[lIdx].name),
+      otRows, prodKpis, beerBars, batchRows, fgBars,
+      navItems, pageTitle:titles[s.view],
+      isOverview:s.view==='overview', isPlaceholder:s.view==='sync',
+      isLocations:s.view==='locations', isLabor:s.view==='labor',
+      locName:locShortName(LD.name), locShort:locShortName(LD.name),
+      locSub:LD.type+' · '+LD.name,
+      locTabs, locKpis, dayparts, menuRows, comboGrid, comboBars, laborLine,
+      laborTargetBottom:(D.laborTarget/50*100).toFixed(1)+'%', laborTargetLabel:D.laborTarget+'%',
+      cogsRows, locAlerts, locAlertCount:D.alerts.length, locBrief:D.brief,
+      sidebarWidth: s.collapsed?'64px':'236px', sidebarOpen:!s.collapsed,
+      toggleSidebar:()=>this.setState(st=>({collapsed:!st.collapsed})),
+      locValue:s.loc,
+      onLocChange:e=>{ const v=e.target.value; this.flash(v==='all' ? {loc:v, laborLoc:'all'} : {loc:v, drill:+v, laborLoc:v}); },
+      rangeValue:s.range, onRangeChange:e=>this.flash({range:e.target.value}),
+      loading:s.loading===true, contentOpacity:s.loading?0.45:1,
+      periodLabel, xLabels,
+      onChartLeave:()=>this.setState({tt:null}), onGroupLeave:()=>this.setState({hb:null}),
+      onRevMove, revTipShow:rt!=null,
+      revTipLeft: rt!=null?(rt/(ser.length-1)*100).toFixed(2)+'%':'0%',
+      revTipBottom: rt!=null?(ser[rt]/top*100).toFixed(2)+'%':'0%',
+      revTipText: rt!=null? tipDay(rt)+' · $'+Math.round(ser[rt]*1000).toLocaleString('en-US'):'',
+      onComboMove, comboTipShow:cbt!=null,
+      comboTipLeft: cbt!=null?(cbt/(serD.length-1)*100).toFixed(2)+'%':'0%',
+      comboTipBottom: cbt!=null?(serD[cbt]/sc2.top*100).toFixed(2)+'%':'0%',
+      comboTipText: cbt!=null? tipDay(cbt)+' · $'+Math.round(serD[cbt]*1000).toLocaleString('en-US')+' · labor '+laborSer[cbt].toFixed(1)+'%':'',
+      onLtMove, ltTipShow:ltt!=null,
+      ltTipLeft: ltt!=null?(ltt/(ltPts.length-1)*100).toFixed(2)+'%':'0%',
+      ltTipBottom: ltt!=null?((ltPts[ltt]-20)/20*100).toFixed(2)+'%':'0%',
+      ltTipText: ltt!=null? tipDay(ltt)+' · labor '+ltPts[ltt].toFixed(1)+'% of sales':'',
+      chartScope: L? L.name : 'All locations (company)',
+      kpis, gridLines, revLinePath, revAreaPath,
+      areaOpacity:(this.props.revenueChartStyle ?? 'Area')==='Area' ? 1 : 0,
+      lastDotBottom:(ser[ser.length-1]/top*100).toFixed(2)+'%',
+      bars, rows, totalRow, alerts, alertCount:this.ALERTS.length,
+      alertsFlex:(this.props.alertsPlacement ?? 'Right rail')==='Right rail' ? '1 1 300px' : '1 1 100%'
+    };
+  }
+}
+</script>
+</body>
+</html>
