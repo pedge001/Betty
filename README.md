@@ -15,12 +15,24 @@ The prototype is a single self-contained page. `support.js` pulls React and Babe
 
 `Hangar 24 Ops.dc.html` and `support.js` must stay in the same folder — the HTML loads the runtime via a relative path.
 
+## Deploying (Railway / any Node host)
+
+The repo is set up to deploy as a static site:
+
+- `npm install` — installs [`serve`](https://www.npmjs.com/package/serve).
+- `npm start` — serves the folder on `$PORT` (Railway sets this automatically; defaults to `3000` locally).
+- `index.html` at the root redirects to the prototype, so the deployed URL just works.
+
+No build step and no database are required for this prototype — it's front-end only.
+
 ## Files
 
 | File | Purpose |
 |------|---------|
 | `Hangar 24 Ops.dc.html` | The prototype (built with Claude Design). Markup, styles, and hard-coded data. |
 | `support.js` | Claude Design runtime that renders the `<x-dc>` template. |
+| `index.html` | Root redirect to the prototype (so `/` loads it when deployed). |
+| `package.json` | Static-serve setup for deployment. |
 | `preview.jpg` | Screenshot used in this README. |
 
 ## Roadmap
