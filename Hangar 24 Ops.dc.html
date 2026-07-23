@@ -14,16 +14,34 @@
   *{box-sizing:border-box;}
   a{color:#14284B;} a:hover{color:#E8720C;}
   @keyframes h24shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .h24-scrim{display:none;}
+  .h24-burger{transition:background .15s ease;}
+  /* Phone / narrow tablets: sidebar becomes an overlay drawer, top bar wraps. */
+  @media (max-width:760px){
+    .h24-side{position:fixed; top:0; left:0; bottom:0; z-index:60; box-shadow:2px 0 24px rgba(2,6,23,0.30);}
+    .h24-col{margin-left:64px !important;}
+    .h24-scrim{display:block; position:fixed; inset:0; z-index:55; background:rgba(15,23,42,0.55);}
+    .h24-topbar{height:auto !important; min-height:58px; padding:11px 14px !important; flex-wrap:wrap !important; row-gap:10px !important; gap:10px !important;}
+    .h24-topbar h1{flex:1 1 100% !important; font-size:18px !important; white-space:normal !important;}
+    .h24-ctl{flex:1 1 44% !important; min-width:0 !important;}
+    .h24-ctl select{width:100% !important; min-width:0 !important;}
+    .h24-main{padding:16px 14px 24px !important;}
+  }
 </style>
 </helmet>
-<div style="display:flex; height:100vh; overflow:hidden">
-  <aside style="width:{{ sidebarWidth }}; transition:width .2s ease; background:#14284B; display:flex; flex-direction:column; flex-shrink:0; overflow:hidden">
-    <div style="display:flex; align-items:center; gap:10px; padding:20px 18px 16px; border-bottom:1px solid rgba(255,255,255,0.08); min-height:70px">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path d="M3 17.5L21 5.5l-1.8 6.3L7.5 19z" fill="#E8720C"></path><path d="M3 20.5h10" stroke="#E8720C" stroke-width="1.6" stroke-linecap="round"></path></svg>
+<div class="h24-root" style="display:flex; height:100vh; overflow:hidden">
+  <aside class="h24-side" style="width:{{ sidebarWidth }}; transition:width .2s ease; background:#14284B; display:flex; flex-direction:column; flex-shrink:0; overflow:hidden">
+    <div style="display:flex; align-items:center; gap:10px; padding:15px 12px; border-bottom:1px solid rgba(255,255,255,0.08); min-height:70px">
+      <button onClick="{{ toggleSidebar }}" title="Toggle menu" aria-label="Toggle menu" class="h24-burger" style="flex-shrink:0; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border:none; border-radius:10px; cursor:pointer; background:rgba(255,255,255,0.06); color:#E8720C" style-hover="background:rgba(255,255,255,0.15)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      </button>
       <sc-if value="{{ sidebarOpen }}" hint-placeholder-val="{{ true }}">
-        <div>
-          <div style="color:#FFFFFF; font-weight:800; font-size:15px; letter-spacing:0.12em; white-space:nowrap">HANGAR 24</div>
-          <div style="color:#E8720C; font-size:9px; font-weight:700; letter-spacing:0.24em; text-transform:uppercase; margin-top:3px; white-space:nowrap">Betty AI</div>
+        <div style="display:flex; align-items:center; gap:9px; min-width:0">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path d="M3 17.5L21 5.5l-1.8 6.3L7.5 19z" fill="#E8720C"></path><path d="M3 20.5h10" stroke="#E8720C" stroke-width="1.6" stroke-linecap="round"></path></svg>
+          <div>
+            <div style="color:#FFFFFF; font-weight:800; font-size:15px; letter-spacing:0.12em; white-space:nowrap">HANGAR 24</div>
+            <div style="color:#E8720C; font-size:9px; font-weight:700; letter-spacing:0.24em; text-transform:uppercase; margin-top:3px; white-space:nowrap">Betty AI</div>
+          </div>
         </div>
       </sc-if>
     </div>
@@ -41,13 +59,12 @@
     </div>
   </aside>
 
-  <div style="flex:1; min-width:0; display:flex; flex-direction:column">
-    <header style="height:64px; background:#FFFFFF; border-bottom:1px solid #E2E8F0; display:flex; align-items:center; gap:14px; padding:0 24px; flex-shrink:0">
-      <button onClick="{{ toggleSidebar }}" title="Toggle sidebar" style="border:none; background:transparent; padding:6px; border-radius:8px; cursor:pointer; color:#64748B; display:flex" style-hover="background:#F1F5F9">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
-      </button>
+  <sc-if value="{{ sidebarOpen }}" hint-placeholder-val="{{ false }}"><div class="h24-scrim" onClick="{{ toggleSidebar }}"></div></sc-if>
+
+  <div class="h24-col" style="flex:1; min-width:0; display:flex; flex-direction:column">
+    <header class="h24-topbar" style="height:64px; background:#FFFFFF; border-bottom:1px solid #E2E8F0; display:flex; align-items:center; gap:14px; padding:0 24px; flex-shrink:0">
       <h1 style="font-size:21px; font-weight:650; color:#14284B; margin:0; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">{{ pageTitle }}</h1>
-      <div style="display:flex; align-items:center; gap:4px; border:1px solid #E2E8F0; border-radius:9px; padding:0 4px 0 12px; background:#FFFFFF; white-space:nowrap">
+      <div class="h24-ctl" style="display:flex; align-items:center; gap:4px; border:1px solid #E2E8F0; border-radius:9px; padding:0 4px 0 12px; background:#FFFFFF; white-space:nowrap">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round"><path d="M8 2v4M16 2v4M3 9h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path></svg>
         <select value="{{ rangeValue }}" onChange="{{ onRangeChange }}" style="border:none; background:transparent; font:inherit; font-size:12.5px; font-weight:600; color:#334155; padding:8px 6px 8px 2px; cursor:pointer; outline:none">
           <option value="mtd">Jul 2026 (MTD)</option>
@@ -55,7 +72,7 @@
           <option value="7d">Last 7 days</option>
         </select>
       </div>
-      <select value="{{ locValue }}" onChange="{{ onLocChange }}" style="border:1px solid #E2E8F0; border-radius:9px; padding:8px 10px; font:inherit; font-size:12.5px; font-weight:600; color:#334155; background:#FFFFFF; cursor:pointer">
+      <select class="h24-ctl" value="{{ locValue }}" onChange="{{ onLocChange }}" style="border:1px solid #E2E8F0; border-radius:9px; padding:8px 10px; font:inherit; font-size:12.5px; font-weight:600; color:#334155; background:#FFFFFF; cursor:pointer">
         <option value="all">All locations</option>
         <option value="0">Redlands, CA</option>
         <option value="1">Orange County, CA</option>
@@ -64,7 +81,7 @@
       </select>
     </header>
 
-    <main data-screen-label="{{ pageTitle }}" style="flex:1; overflow-y:auto; padding:22px 24px 32px; position:relative">
+    <main class="h24-main" data-screen-label="{{ pageTitle }}" style="flex:1; overflow-y:auto; padding:22px 24px 32px; position:relative">
       <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}"><div style="position:absolute; inset:0; z-index:20; pointer-events:none; background:linear-gradient(100deg, rgba(248,250,252,0) 30%, rgba(255,255,255,0.9) 50%, rgba(248,250,252,0) 70%); background-size:200% 100%; animation:h24shimmer 0.7s linear infinite"></div></sc-if>
       <div style="opacity:{{ contentOpacity }}; transition:opacity 0.15s">
       <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
@@ -1227,7 +1244,19 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;alertsPlacement&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Right rail&quot;,&quot;Below&quot;],&quot;default&quot;:&quot;Right rail&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;revenueChartStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Area&quot;,&quot;Line&quot;],&quot;default&quot;:&quot;Area&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Charts&quot;}}">
 class Component extends DCLogic {
-  state = { view: 'overview', collapsed: false, loc: 'all', drill: 1, opsTab: 'labor', laborLoc: 'all', range: 'mtd', loading: false, tt: null, hb: null,
+  MOBILE_Q = '(max-width:760px)';
+  isMobile(){ return typeof window!=='undefined' && !!window.matchMedia && window.matchMedia(this.MOBILE_Q).matches; }
+  componentDidMount(){
+    if (typeof window==='undefined' || !window.matchMedia) return;
+    this._mq = window.matchMedia(this.MOBILE_Q);
+    this._onMq = e => this.setState({ collapsed: e.matches });
+    this._mq.addEventListener ? this._mq.addEventListener('change', this._onMq) : this._mq.addListener(this._onMq);
+  }
+  componentWillUnmount(){
+    if (!this._mq) return;
+    this._mq.removeEventListener ? this._mq.removeEventListener('change', this._onMq) : this._mq.removeListener(this._onMq);
+  }
+  state = { view: 'overview', collapsed: (typeof window!=='undefined' && !!window.matchMedia && window.matchMedia('(max-width:760px)').matches), loc: 'all', drill: 1, opsTab: 'labor', laborLoc: 'all', range: 'mtd', loading: false, tt: null, hb: null,
     reportView: 'index', soonTitle: '', soonDesc: '', rpPeriod: 'mtd', rpScope: 'all', rpSortKey: 'prime', rpSortDir: 1, rpExpand: null,
     ppPeriod: 'mtd', ppScope: 'all', ppSortKey: 'gp', ppSortDir: -1, ppExpand: null };
   rpSeries(scope, period){
@@ -1421,7 +1450,7 @@ class Component extends DCLogic {
       bg: s.view===k ? 'rgba(232,114,12,0.16)' : 'transparent',
       color: s.view===k ? '#FCA55F' : '#93A3BE',
       hoverBg: s.view===k ? 'rgba(232,114,12,0.16)' : 'rgba(255,255,255,0.07)',
-      onClick: ()=> this.flash(k==='reports' ? {view:k, reportView:'index', rpExpand:null, ppExpand:null} : {view:k})
+      onClick: ()=> this.flash(Object.assign(k==='reports' ? {view:k, reportView:'index', rpExpand:null, ppExpand:null} : {view:k}, this.isMobile() ? {collapsed:true} : {}))
     }));
 
     const rev = L? L.revenue : this.COMPANY.revenue;
