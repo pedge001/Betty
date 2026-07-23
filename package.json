@@ -1,13 +1,15 @@
 {
   "name": "betty-hangar24-ops",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
-  "description": "Front-end prototype of Betty — Hangar 24 Ops (static site)",
+  "description": "Betty — Hangar 24 Ops prototype + first-party traffic logging",
   "scripts": {
-    "start": "serve . -l tcp://0.0.0.0:${PORT:-3000} --no-clipboard"
+    "start": "node server.js"
   },
   "dependencies": {
-    "serve": "^14.2.4"
+    "express": "^4.19.2",
+    "geoip-lite": "^1.4.10",
+    "pg": "^8.11.5"
   },
   "engines": {
     "node": ">=18"

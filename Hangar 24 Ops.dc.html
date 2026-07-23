@@ -4,6 +4,48 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<script>
+/* First-party view tracking: reports each screen the visitor lands on to
+   /api/collect. Fails silently; never blocks the app. */
+(function(){
+  var last = null;
+  function send(screen){
+    if (screen === last) return;
+    last = screen;
+    try{
+      fetch('/api/collect', {
+        method:'POST', credentials:'same-origin', keepalive:true,
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ path: location.pathname, screen: screen || '', referrer: document.referrer || '' })
+      }).catch(function(){});
+    }catch(e){}
+  }
+  function currentScreen(){
+    var el = document.querySelector('[data-screen-label]');
+    if (!el) return '';
+    var v = el.getAttribute('data-screen-label') || '';
+    if (v.indexOf('{{') !== -1) return ''; // template not interpolated yet — wait
+    return v;
+  }
+  function observe(){
+    try{
+      new MutationObserver(function(){ send(currentScreen()); })
+        .observe(document.body, { subtree:true, childList:true, attributes:true, attributeFilter:['data-screen-label'] });
+    }catch(e){}
+  }
+  function start(){
+    var tries = 0;
+    (function poll(){
+      var s = currentScreen();
+      if (s) { send(s); observe(); }
+      else if (tries++ < 15) { setTimeout(poll, 200); }
+      else { send(''); observe(); } // fall back to logging the visit
+    })();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+})();
+</script>
 </head>
 <body>
 <x-dc>
