@@ -32,8 +32,13 @@ No build step and no database are required for this prototype — it's front-end
 | `Hangar 24 Ops.dc.html` | The prototype (built with Claude Design). Markup, styles, and hard-coded data. |
 | `support.js` | Claude Design runtime that renders the `<x-dc>` template. |
 | `index.html` | Root redirect to the prototype (so `/` loads it when deployed). |
+| `admin/index.html` | Traffic dashboard at **`/admin`** — intentionally unlinked from the app; reach it by typing the URL. Simulated data for now. |
 | `package.json` | Static-serve setup for deployment. |
 | `preview.jpg` | Screenshot used in this README. |
+
+## Admin traffic page (`/admin`)
+
+A standalone traffic dashboard lives at `/admin` (KPIs, a 30-day visits trend, **visitors by city**, top pages, device/source/region splits). It is **not linked anywhere in the app** — it's only reachable by typing the URL. The figures are simulated; in production, visits would be logged to the Postgres warehouse on Railway with city/region resolved from visitor IP via geo-IP lookup.
 
 ## Roadmap
 

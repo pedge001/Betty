@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Betty · Traffic Admin</title>
+<style>
+  :root{
+    --navy:#14284B; --navy-2:#1D3763; --orange:#E8720C; --ink:#0F172A;
+    --muted:#64748B; --line:#E2E8F0; --bg:#F8FAFC; --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  .topbar{background:var(--navy);color:#fff;padding:16px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand .name{font-weight:800;font-size:15px;letter-spacing:0.12em;}
+  .brand .sub{color:var(--orange);font-size:9px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;margin-top:2px;}
+  .title{font-size:16px;font-weight:650;margin-left:6px;}
+  .spacer{flex:1;}
+  .pill{font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--orange);
+    background:rgba(232,114,12,0.14);border:1px solid rgba(232,114,12,0.5);border-radius:999px;padding:4px 10px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+  .range{font-size:12.5px;color:#CBD5E1;font-weight:600;white-space:nowrap;}
+  main{max-width:1180px;margin:0 auto;padding:22px 24px 40px;}
+  .h{font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+  .grid{display:grid;gap:16px;}
+  .kpis{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:16px;}
+  .two{grid-template-columns:1fr;margin-bottom:16px;}
+  @media(min-width:820px){ .two{grid-template-columns:2fr 1fr;} .two.even{grid-template-columns:1fr 1fr;} }
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;}
+  .kpi .label{font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);}
+  .kpi .value{font-size:27px;font-weight:700;color:var(--navy);line-height:1.1;margin-top:8px;font-variant-numeric:tabular-nums;}
+  .kpi .delta{margin-top:7px;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .up{color:#059669;} .down{color:#BE123C;}
+  .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+  .panel-title{font-size:14.5px;font-weight:650;color:var(--ink);}
+  .panel-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+  .tag{font-size:9.5px;font-weight:600;letter-spacing:0.04em;color:var(--muted);background:#F1F5F9;border:1px solid var(--line);border-radius:999px;padding:2px 8px;white-space:nowrap;}
+  .chart-wrap{position:relative;height:230px;margin-top:16px;}
+  .gridline{position:absolute;left:0;right:0;border-top:1px dashed #E8EEF5;}
+  .gridline span{position:absolute;right:0;top:-14px;font-size:10px;color:#94A3B8;font-variant-numeric:tabular-nums;}
+  .xrow{display:flex;justify-content:space-between;margin-top:10px;font-size:10.5px;color:#94A3B8;font-variant-numeric:tabular-nums;}
+  /* city / list rows */
+  .rows{margin-top:14px;}
+  .cityrow{display:grid;grid-template-columns:20px 1fr 88px;align-items:center;gap:12px;padding:9px 0;border-top:1px solid #F1F5F9;}
+  .cityrow:first-child{border-top:none;}
+  .rank{font-size:11px;font-weight:700;color:#94A3B8;text-align:center;font-variant-numeric:tabular-nums;}
+  .cityname{min-width:0;}
+  .cityname .n{font-size:13px;font-weight:650;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cityname .r{font-size:11px;color:#94A3B8;}
+  .bar{height:8px;background:#F1F5F9;border-radius:5px;overflow:hidden;margin-top:6px;}
+  .bar > span{display:block;height:100%;background:var(--orange);border-radius:5px;}
+  .cityval{text-align:right;font-variant-numeric:tabular-nums;}
+  .cityval .v{font-size:13px;font-weight:700;color:var(--navy);}
+  .cityval .p{font-size:11px;color:#94A3B8;}
+  .cities-grid{display:grid;gap:0 32px;grid-template-columns:1fr;}
+  @media(min-width:720px){ .cities-grid{grid-template-columns:1fr 1fr;} }
+  .split{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+  .splitrow{display:flex;align-items:center;gap:12px;}
+  .splitrow .k{font-size:12.5px;color:#334155;width:104px;flex-shrink:0;}
+  .splitrow .track{flex:1;height:10px;background:#F1F5F9;border-radius:5px;overflow:hidden;}
+  .splitrow .track > span{display:block;height:100%;border-radius:5px;}
+  .splitrow .pct{font-size:12px;font-weight:650;color:var(--navy);width:44px;text-align:right;font-variant-numeric:tabular-nums;}
+  .foot{font-size:11.5px;color:#94A3B8;margin-top:22px;line-height:1.6;text-wrap:pretty;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);display:inline-block;}
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 17.5L21 5.5l-1.8 6.3L7.5 19z" fill="#E8720C"></path><path d="M3 20.5h10" stroke="#E8720C" stroke-width="1.6" stroke-linecap="round"></path></svg>
+      <div><div class="name">HANGAR 24</div><div class="sub">Betty AI</div></div>
+    </div>
+    <div class="title">Traffic · Admin</div>
+    <div class="spacer"></div>
+    <span class="pill"><span class="dot"></span>Prototype · Simulated data</span>
+    <span class="range" id="range">Last 30 days</span>
+  </header>
+
+  <main>
+    <section class="grid kpis" id="kpis"></section>
+
+    <section class="grid two">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Visits — last 30 days</div>
+            <div class="panel-sub" id="chartSub">Daily sessions across all pages</div>
+          </div>
+          <span class="tag">Sessions</span>
+        </div>
+        <div class="chart-wrap" id="chart"></div>
+        <div class="xrow" id="xrow"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">Sessions by device</div><div class="panel-sub">Share of visits</div></div>
+        </div>
+        <div class="split" id="devices"></div>
+        <div class="panel-head" style="margin-top:22px">
+          <div><div class="panel-title">Traffic sources</div><div class="panel-sub">How visitors arrive</div></div>
+        </div>
+        <div class="split" id="sources"></div>
+      </div>
+    </section>
+
+    <section class="grid two" style="grid-template-columns:1fr">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Visitors by city</div>
+            <div class="panel-sub" id="citySub">Top cities by sessions</div>
+          </div>
+          <span class="tag" id="cityCount">— cities</span>
+        </div>
+        <div class="cities-grid" id="cities"></div>
+      </div>
+    </section>
+
+    <section class="grid two even">
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">Top pages</div><div class="panel-sub">Most-viewed screens</div></div>
+        </div>
+        <div class="rows" id="pages"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">Regions</div><div class="panel-sub">Sessions by state / area</div></div>
+        </div>
+        <div class="split" id="regions"></div>
+      </div>
+    </section>
+
+    <div class="foot" id="foot"></div>
+  </main>
+
+<script>
+(function(){
+  // ---- Simulated traffic data (front-end prototype; not live) -------------
+  // In the real build this comes from a tracking endpoint writing to the
+  // Postgres warehouse on Railway, with city/region resolved via geo-IP.
+  var asOf = 'Jul 23, 2026';
+  var daily = [92,120,138,142,150,72,60, 98,132,145,150,158,80,64, 104,140,150,156,162,86,70, 110,146,156,160,168,90,74, 118,150];
+  var total = daily.reduce(function(a,b){return a+b;},0);
+
+  var cities = [
+    ['Redlands','CA',612],['Riverside','CA',438],['Orange','CA',356],['Los Angeles','CA',298],
+    ['San Bernardino','CA',264],['Irvine','CA',236],['Lake Havasu City','AZ',198],['San Diego','CA',174],
+    ['Phoenix','AZ',152],['Ontario','CA',138],['Long Beach','CA',121],['Palm Springs','CA',96]
+  ];
+  var topCitySum = cities.reduce(function(a,c){return a+c[2];},0);
+  var otherCities = 30, otherVisits = Math.max(0, total - topCitySum);
+  var totalCities = cities.length + otherCities;
+
+  var devices = [['Desktop',68,'#14284B'],['Mobile',27,'#E8720C'],['Tablet',5,'#94A3B8']];
+  var sources = [['Direct',74,'#14284B'],['Internal link',18,'#3B5C93'],['Email',8,'#E8720C']];
+  var pages = [
+    ['Executive Overview','/overview',4120],['Prime Cost Command Center','/reports/prime-cost',2060],
+    ['Labor & Production','/labor',1740],['Locations','/locations',1380],
+    ['Draft Profitability','/reports/profitability',1120],['Sync Health','/sync',880]
+  ];
+  var regions = [['California',82,'#14284B'],['Arizona',12,'#E8720C'],['Nevada',3,'#3B5C93'],['Other',3,'#94A3B8']];
+
+  var fmt = function(n){ return n.toLocaleString('en-US'); };
+  var el = function(id){ return document.getElementById(id); };
+
+  el('range').textContent = 'Last 30 days · through ' + asOf;
+  el('cityCount').textContent = totalCities + ' cities';
+  el('citySub').textContent = 'Top ' + cities.length + ' of ' + totalCities + ' cities by sessions';
+
+  // ---- KPIs ---------------------------------------------------------------
+  var kpis = [
+    {label:'Total visits', value:fmt(total), delta:'+8.4% vs prior 30d', up:true},
+    {label:'Unique visitors', value:'1,286', delta:'+6.1% vs prior 30d', up:true},
+    {label:'Page views', value:'11,940', delta:'+9.7% vs prior 30d', up:true},
+    {label:'Avg. session', value:'4m 12s', delta:'+18s vs prior 30d', up:true},
+    {label:'Bounce rate', value:'31.8%', delta:'-2.3 pts vs prior 30d', up:true}
+  ];
+  el('kpis').innerHTML = kpis.map(function(k){
+    return '<div class="card kpi"><div class="label">'+k.label+'</div><div class="value">'+k.value+
+      '</div><div class="delta '+(k.up?'up':'down')+'">'+k.delta+'</div></div>';
+  }).join('');
+
+  // ---- Visits chart (SVG area + line) ------------------------------------
+  (function(){
+    var n = daily.length, max = Math.max.apply(null, daily);
+    var top = Math.ceil(max/50)*50;
+    var W = 1000, H = 240, pad = 16;
+    var x = function(i){ return (i/(n-1))*W; };
+    var y = function(v){ return H - pad - (v/top)*(H - pad*2); };
+    var line = daily.map(function(v,i){ return (i===0?'M':'L') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
+    var area = 'M0 ' + (H-pad) + ' ' + daily.map(function(v,i){ return 'L'+x(i).toFixed(1)+' '+y(v).toFixed(1); }).join(' ') + ' L'+W+' '+(H-pad)+' Z';
+    var glHtml = '';
+    for(var g=0; g<=top; g+=Math.round(top/4)){
+      var bottom = ((g/top)*(H-pad*2)+pad)/H*100;
+      glHtml += '<div class="gridline" style="bottom:'+bottom.toFixed(1)+'%"><span>'+g+'</span></div>';
+    }
+    var svg = '<svg style="position:absolute;inset:0;width:100%;height:100%;overflow:visible" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+
+      '<path d="'+area+'" fill="rgba(20,40,75,0.07)"></path>'+
+      '<path d="'+line+'" fill="none" stroke="#14284B" stroke-width="2.5" vector-effect="non-scaling-stroke"></path>'+
+      '</svg>';
+    el('chart').innerHTML = glHtml + svg;
+    // x labels (weekly-ish)
+    var labels = ['Jun 24','Jul 1','Jul 8','Jul 15','Jul 23'];
+    el('xrow').innerHTML = labels.map(function(l){ return '<span>'+l+'</span>'; }).join('');
+  })();
+
+  // ---- Cities -------------------------------------------------------------
+  (function(){
+    var maxCity = cities[0][2];
+    var html = cities.map(function(c,i){
+      var w = (c[2]/maxCity*100).toFixed(1);
+      var pct = (c[2]/total*100).toFixed(1);
+      return '<div class="cityrow"><div class="rank">'+(i+1)+'</div>'+
+        '<div class="cityname"><div class="n">'+c[0]+', '+c[1]+'</div>'+
+        '<div class="bar"><span style="width:'+w+'%"></span></div></div>'+
+        '<div class="cityval"><div class="v">'+fmt(c[2])+'</div><div class="p">'+pct+'%</div></div></div>';
+    }).join('');
+    // trailing "other cities" row
+    var w2 = (otherVisits/maxCity*100).toFixed(1);
+    html += '<div class="cityrow"><div class="rank">·</div>'+
+      '<div class="cityname"><div class="n" style="color:#64748B">Other cities ('+otherCities+')</div>'+
+      '<div class="bar"><span style="width:'+w2+'%;background:#CBD5E1"></span></div></div>'+
+      '<div class="cityval"><div class="v" style="color:#64748B">'+fmt(otherVisits)+'</div><div class="p">'+(otherVisits/total*100).toFixed(1)+'%</div></div></div>';
+    el('cities').innerHTML = html;
+  })();
+
+  // ---- Split bars (devices / sources / regions) ---------------------------
+  function renderSplit(id, data){
+    el(id).innerHTML = data.map(function(d){
+      return '<div class="splitrow"><div class="k">'+d[0]+'</div>'+
+        '<div class="track"><span style="width:'+d[1]+'%;background:'+d[2]+'"></span></div>'+
+        '<div class="pct">'+d[1]+'%</div></div>';
+    }).join('');
+  }
+  renderSplit('devices', devices);
+  renderSplit('sources', sources);
+  renderSplit('regions', regions);
+
+  // ---- Top pages ----------------------------------------------------------
+  (function(){
+    var maxP = pages[0][2];
+    el('pages').innerHTML = pages.map(function(p,i){
+      var w = (p[2]/maxP*100).toFixed(1);
+      return '<div class="cityrow"><div class="rank">'+(i+1)+'</div>'+
+        '<div class="cityname"><div class="n">'+p[0]+'</div><div class="r">'+p[1]+'</div>'+
+        '<div class="bar"><span style="width:'+w+'%;background:#3B5C93"></span></div></div>'+
+        '<div class="cityval"><div class="v">'+fmt(p[2])+'</div><div class="p">views</div></div></div>';
+    }).join('');
+  })();
+
+  el('foot').innerHTML = '<span class="dot"></span> Prototype dashboard — all figures are simulated for demonstration. ' +
+    'In production, visits are logged to the Postgres warehouse on Railway and city/region are resolved from visitor IP via geo-IP lookup. ' +
+    'This page is intentionally unlinked from the app and reachable only at <strong>/admin</strong>.';
+})();
+</script>
+</body>
+</html>
