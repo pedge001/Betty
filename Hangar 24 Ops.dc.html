@@ -26,6 +26,18 @@
     .h24-ctl{flex:1 1 44% !important; min-width:0 !important;}
     .h24-ctl select{width:100% !important; min-width:0 !important;}
     .h24-main{padding:16px 14px 24px !important;}
+    /* Deep tables render as stacked cards instead of a horizontal scroll. */
+    .h24-tbl{min-width:0 !important; margin-top:8px !important;}
+    .h24-tbl thead{display:none !important;}
+    .h24-tbl tbody{display:block;}
+    .h24-tbl tr{display:block; border:1px solid #E7ECF3; border-radius:12px; margin-bottom:10px; box-shadow:0 1px 2px rgba(15,23,42,0.04); overflow:hidden;}
+    .h24-tbl td{display:flex !important; align-items:center; justify-content:space-between; gap:16px; text-align:right !important; padding:8px 13px !important; border-bottom:1px solid #F3F6FA !important;}
+    .h24-tbl tr td:last-child{border-bottom:none !important;}
+    .h24-tbl td::before{content:attr(data-label); text-align:left; font-size:10px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#94A3B8; white-space:nowrap; flex:0 0 auto;}
+    .h24-tbl td.h24-td-head{display:block !important; text-align:left !important; padding:11px 13px 9px !important; border-bottom:1px solid #EEF2F7 !important;}
+    .h24-tbl td.h24-td-head::before{display:none;}
+    .h24-tbl td.h24-td-full{display:block !important; text-align:left !important; padding:14px !important;}
+    .h24-tbl td.h24-td-full::before{display:none;}
   }
 </style>
 </helmet>
@@ -101,7 +113,7 @@
         <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:stretch">
           <div style="flex:3 1 540px; min-width:0; display:flex; flex-direction:column; gap:20px">
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
                 <div>
                   <div style="font-size:14.5px; font-weight:650; color:#0F172A">Net revenue — trailing 21 days</div>
                   <div style="font-size:12px; color:#64748B; margin-top:3px">{{ chartScope }} · {{ periodLabel }}</div>
@@ -193,7 +205,7 @@
             <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Toast + MarginEdge + Paylocity</span>
           </div>
           <div style="overflow-x:auto">
-            <table style="width:100%; border-collapse:collapse; margin-top:14px; font-variant-numeric:tabular-nums; min-width:760px">
+            <table class="h24-tbl" style="width:100%; border-collapse:collapse; margin-top:14px; font-variant-numeric:tabular-nums; min-width:760px">
               <thead>
                 <tr>
                   <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:8px 10px; border-bottom:1px solid #E2E8F0">Location</th>
@@ -207,24 +219,24 @@
               <tbody>
                 <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
                   <tr onClick="{{ r.goto }}" title="Open location drill-down" style="background:{{ r.bg }}; cursor:pointer">
-                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9">
+                    <td class="h24-td-head" style="padding:11px 10px; border-bottom:1px solid #F1F5F9">
                       <div style="font-size:13px; font-weight:650; color:#0F172A">{{ r.name }}</div>
                       <div style="font-size:11px; color:#94A3B8; margin-top:2px">{{ r.type }}</div>
                     </td>
-                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:13px; font-weight:650; color:#14284B">{{ r.revenue }}</td>
-                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ r.cogs }}</td>
-                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ r.labor }}</td>
-                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right"><span style="font-size:11.5px; font-weight:700; border-radius:999px; padding:3px 10px; background:{{ r.pillBg }}; color:{{ r.pillColor }}">{{ r.prime }}</span></td>
-                    <td style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ r.spark }}" fill="none" stroke="#14284B" stroke-width="1.5" opacity="0.7"></polyline></svg></td>
+                    <td data-label="Revenue (MTD)" style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:13px; font-weight:650; color:#14284B">{{ r.revenue }}</td>
+                    <td data-label="COGS %" style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ r.cogs }}</td>
+                    <td data-label="Labor %" style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ r.labor }}</td>
+                    <td data-label="Prime %" style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right"><span style="font-size:11.5px; font-weight:700; border-radius:999px; padding:3px 10px; background:{{ r.pillBg }}; color:{{ r.pillColor }}">{{ r.prime }}</span></td>
+                    <td data-label="21-day trend" style="padding:11px 10px; border-bottom:1px solid #F1F5F9; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ r.spark }}" fill="none" stroke="#14284B" stroke-width="1.5" opacity="0.7"></polyline></svg></td>
                   </tr>
                 </sc-for>
                 <tr>
-                  <td style="padding:11px 10px"><div style="font-size:13px; font-weight:700; color:#14284B">Company total</div></td>
-                  <td style="padding:11px 10px; text-align:right; font-size:13px; font-weight:700; color:#14284B">{{ totalRow.revenue }}</td>
-                  <td style="padding:11px 10px; text-align:right; font-size:12.5px; font-weight:650; color:#334155">{{ totalRow.cogs }}</td>
-                  <td style="padding:11px 10px; text-align:right; font-size:12.5px; font-weight:650; color:#334155">{{ totalRow.labor }}</td>
-                  <td style="padding:11px 10px; text-align:right"><span style="font-size:11.5px; font-weight:700; border-radius:999px; padding:3px 10px; background:{{ totalRow.pillBg }}; color:{{ totalRow.pillColor }}">{{ totalRow.prime }}</span></td>
-                  <td style="padding:11px 10px; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ totalRow.spark }}" fill="none" stroke="#E8720C" stroke-width="1.5"></polyline></svg></td>
+                  <td class="h24-td-head" style="padding:11px 10px"><div style="font-size:13px; font-weight:700; color:#14284B">Company total</div></td>
+                  <td data-label="Revenue (MTD)" style="padding:11px 10px; text-align:right; font-size:13px; font-weight:700; color:#14284B">{{ totalRow.revenue }}</td>
+                  <td data-label="COGS %" style="padding:11px 10px; text-align:right; font-size:12.5px; font-weight:650; color:#334155">{{ totalRow.cogs }}</td>
+                  <td data-label="Labor %" style="padding:11px 10px; text-align:right; font-size:12.5px; font-weight:650; color:#334155">{{ totalRow.labor }}</td>
+                  <td data-label="Prime %" style="padding:11px 10px; text-align:right"><span style="font-size:11.5px; font-weight:700; border-radius:999px; padding:3px 10px; background:{{ totalRow.pillBg }}; color:{{ totalRow.pillColor }}">{{ totalRow.prime }}</span></td>
+                  <td data-label="21-day trend" style="padding:11px 10px; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ totalRow.spark }}" fill="none" stroke="#E8720C" stroke-width="1.5"></polyline></svg></td>
                 </tr>
               </tbody>
             </table>
@@ -261,7 +273,7 @@
         <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start">
           <div style="flex:3 1 560px; min-width:0; display:flex; flex-direction:column; gap:20px">
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
                 <div style="font-size:14.5px; font-weight:650; color:#0F172A">Sales by daypart</div>
                 <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Toast</span>
               </div>
@@ -277,7 +289,7 @@
             </div>
 
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
                 <div>
                   <div style="font-size:14.5px; font-weight:650; color:#0F172A">Menu / product mix</div>
                   <div style="font-size:12px; color:#64748B; margin-top:3px">Top 8 items by net sales, MTD</div>
@@ -285,7 +297,7 @@
                 <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Toast</span>
               </div>
               <div style="overflow-x:auto">
-                <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:560px">
+                <table class="h24-tbl" style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:560px">
                   <thead>
                     <tr>
                       <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Item</th>
@@ -298,11 +310,11 @@
                   <tbody>
                     <sc-for list="{{ menuRows }}" as="m" hint-placeholder-count="8">
                       <tr style="background:{{ m.bg }}">
-                        <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ m.item }}</td>
-                        <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9"><span style="font-size:10.5px; font-weight:650; color:{{ m.catColor }}; background:{{ m.catBg }}; border-radius:999px; padding:2px 8px; white-space:nowrap">{{ m.cat }}</span></td>
-                        <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ m.units }}</td>
-                        <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ m.sales }}</td>
-                        <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9">
+                        <td class="h24-td-head" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ m.item }}</td>
+                        <td data-label="Category" style="padding:9px 10px; border-bottom:1px solid #F1F5F9"><span style="font-size:10.5px; font-weight:650; color:{{ m.catColor }}; background:{{ m.catBg }}; border-radius:999px; padding:2px 8px; white-space:nowrap">{{ m.cat }}</span></td>
+                        <td data-label="Units" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ m.units }}</td>
+                        <td data-label="Net sales" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ m.sales }}</td>
+                        <td data-label="Mix %" style="padding:9px 10px; border-bottom:1px solid #F1F5F9">
                           <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px">
                             <span style="font-size:12px; color:#334155">{{ m.mix }}</span>
                             <div style="width:48px; height:6px; background:#F1F5F9; border-radius:3px; overflow:hidden"><div style="height:100%; width:{{ m.mixW }}; background:#E8720C; border-radius:3px"></div></div>
@@ -352,14 +364,14 @@
             </div>
 
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
                 <div>
                   <div style="font-size:14.5px; font-weight:650; color:#0F172A">Cost of goods detail</div>
                   <div style="font-size:12px; color:#64748B; margin-top:3px">Top invoice categories, MTD</div>
                 </div>
                 <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">MarginEdge</span>
               </div>
-              <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums">
+              <table class="h24-tbl" style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums">
                 <thead>
                   <tr>
                     <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Category</th>
@@ -371,10 +383,10 @@
                 <tbody>
                   <sc-for list="{{ cogsRows }}" as="c" hint-placeholder-count="6">
                     <tr style="background:{{ c.bg }}">
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ c.cat }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ c.spend }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ c.pct }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; font-weight:650; color:{{ c.deltaColor }}">{{ c.delta }}</td>
+                      <td class="h24-td-head" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ c.cat }}</td>
+                      <td data-label="Spend (MTD)" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ c.spend }}</td>
+                      <td data-label="% of sales" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ c.pct }}</td>
+                      <td data-label="vs prior period" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; font-weight:650; color:{{ c.deltaColor }}">{{ c.delta }}</td>
                     </tr>
                   </sc-for>
                 </tbody>
@@ -510,7 +522,7 @@
           </div>
 
           <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px; margin-bottom:20px">
-            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
               <div>
                 <div style="font-size:14.5px; font-weight:650; color:#0F172A">Overtime watch</div>
                 <div style="font-size:12px; color:#64748B; margin-top:3px">Shifts trending into OT, week of Jul 14–20</div>
@@ -518,7 +530,7 @@
               <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Sling + Paylocity</span>
             </div>
             <div style="overflow-x:auto">
-              <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:680px">
+              <table class="h24-tbl" style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:680px">
                 <thead>
                   <tr>
                     <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Employee</th>
@@ -533,13 +545,13 @@
                 <tbody>
                   <sc-for list="{{ otRows }}" as="o" hint-placeholder-count="8">
                     <tr style="background:{{ o.bg }}">
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ o.name }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ o.loc }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ o.role }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ o.sched }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ o.actual }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:{{ o.otColor }}">{{ o.ot }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right"><span style="font-size:10.5px; font-weight:700; border-radius:999px; padding:3px 9px; white-space:nowrap; background:{{ o.badgeBg }}; color:{{ o.badgeColor }}">{{ o.badge }}</span></td>
+                      <td class="h24-td-head" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ o.name }}</td>
+                      <td data-label="Location" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ o.loc }}</td>
+                      <td data-label="Role" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ o.role }}</td>
+                      <td data-label="Sched hrs" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ o.sched }}</td>
+                      <td data-label="Actual hrs" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ o.actual }}</td>
+                      <td data-label="OT hrs" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:{{ o.otColor }}">{{ o.ot }}</td>
+                      <td data-label="Status" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right"><span style="font-size:10.5px; font-weight:700; border-radius:999px; padding:3px 9px; white-space:nowrap; background:{{ o.badgeBg }}; color:{{ o.badgeColor }}">{{ o.badge }}</span></td>
                     </tr>
                   </sc-for>
                 </tbody>
@@ -569,7 +581,7 @@
 
           <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:stretch; margin-bottom:20px">
             <div style="flex:1 1 420px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
                 <div>
                   <div style="font-size:14.5px; font-weight:650; color:#0F172A">Production by beer</div>
                   <div style="font-size:12px; color:#64748B; margin-top:3px">BBL produced MTD · all brewed at Redlands</div>
@@ -588,7 +600,7 @@
             </div>
 
             <div style="flex:1 1 420px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
                 <div>
                   <div style="font-size:14.5px; font-weight:650; color:#0F172A">Finished goods vs par</div>
                   <div style="font-size:12px; color:#64748B; margin-top:3px">Half-barrel kegs on hand · marker = par level</div>
@@ -611,7 +623,7 @@
           </div>
 
           <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px; margin-bottom:20px">
-            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
               <div>
                 <div style="font-size:14.5px; font-weight:650; color:#0F172A">Batches in progress</div>
                 <div style="font-size:12px; color:#64748B; margin-top:3px">8 active batches · Redlands brewhouse</div>
@@ -619,7 +631,7 @@
               <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Ekos</span>
             </div>
             <div style="overflow-x:auto">
-              <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:760px">
+              <table class="h24-tbl" style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:760px">
                 <thead>
                   <tr>
                     <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Batch</th>
@@ -634,13 +646,13 @@
                 <tbody>
                   <sc-for list="{{ batchRows }}" as="b" hint-placeholder-count="8">
                     <tr style="background:{{ b.bg }}">
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ b.id }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; color:#334155">{{ b.beer }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9"><span style="font-size:10.5px; font-weight:650; border-radius:999px; padding:2px 8px; white-space:nowrap; background:{{ b.stageBg }}; color:{{ b.stageColor }}">{{ b.stage }}</span></td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ b.tank }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ b.start }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ b.ready }}</td>
-                      <td style="padding:9px 10px; border-bottom:1px solid #F1F5F9">
+                      <td class="h24-td-head" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ b.id }}</td>
+                      <td data-label="Beer" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; color:#334155">{{ b.beer }}</td>
+                      <td data-label="Stage" style="padding:9px 10px; border-bottom:1px solid #F1F5F9"><span style="font-size:10.5px; font-weight:650; border-radius:999px; padding:2px 8px; white-space:nowrap; background:{{ b.stageBg }}; color:{{ b.stageColor }}">{{ b.stage }}</span></td>
+                      <td data-label="Tank" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ b.tank }}</td>
+                      <td data-label="Started" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ b.start }}</td>
+                      <td data-label="Ready (proj.)" style="padding:9px 10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ b.ready }}</td>
+                      <td data-label="Progress" style="padding:9px 10px; border-bottom:1px solid #F1F5F9">
                         <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px">
                           <span style="font-size:11.5px; color:#334155">{{ b.pct }}</span>
                           <div style="width:88px; height:6px; background:#F1F5F9; border-radius:3px; overflow:hidden"><div style="height:100%; width:{{ b.pct }}; background:#E8720C; border-radius:3px"></div></div>
@@ -818,7 +830,7 @@
             </div>
 
             <div style="flex:1 1 380px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
                 <div>
                   <div style="font-size:14.5px; font-weight:650; color:#0F172A">Prime cost by location</div>
                   <div style="font-size:12px; color:#64748B; margin-top:3px">Sorted worst first · dashed line = 60% target</div>
@@ -851,7 +863,7 @@
           </div>
 
           <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
               <div>
                 <div style="font-size:14.5px; font-weight:650; color:#0F172A">Prime cost detail by location</div>
                 <div style="font-size:12px; color:#64748B; margin-top:3px">Click a column to sort · click a row to expand its drivers</div>
@@ -859,7 +871,7 @@
               <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Toast + MarginEdge + Sling + Paylocity</span>
             </div>
             <div style="overflow-x:auto">
-              <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:920px">
+              <table class="h24-tbl" style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:920px">
                 <thead>
                   <tr>
                     <sc-for list="{{ rpCols }}" as="c" hint-placeholder-count="10">
@@ -870,19 +882,19 @@
                 <tbody>
                   <sc-for list="{{ rpRows }}" as="r" hint-placeholder-count="4">
                     <tr onClick="{{ r.onExpand }}" style="background:{{ r.bg }}; cursor:pointer">
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9"><div style="display:flex; align-items:center; gap:7px"><span style="font-size:10px; color:#94A3B8">{{ r.chev }}</span><div><div style="font-size:12.5px; font-weight:650; color:#0F172A">{{ r.loc }}</div><div style="font-size:10.5px; color:#94A3B8">{{ r.type }}</div></div></div></td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ r.sales }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.cogsD }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.cogs }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.laborD }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.labor }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.primeD }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right"><span style="font-size:11.5px; font-weight:700; border-radius:999px; padding:3px 10px; background:{{ r.pillBg }}; color:{{ r.pillColor }}">{{ r.prime }}</span></td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; font-weight:700; color:{{ r.deltaColor }}">{{ r.delta }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ r.spark }}" fill="none" stroke="#14284B" stroke-width="1.5" opacity="0.7"></polyline></svg></td>
+                      <td class="h24-td-head" style="padding:10px; border-bottom:1px solid #F1F5F9"><div style="display:flex; align-items:center; gap:7px"><span style="font-size:10px; color:#94A3B8">{{ r.chev }}</span><div><div style="font-size:12.5px; font-weight:650; color:#0F172A">{{ r.loc }}</div><div style="font-size:10.5px; color:#94A3B8">{{ r.type }}</div></div></div></td>
+                      <td data-label="Net sales" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ r.sales }}</td>
+                      <td data-label="COGS $" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.cogsD }}</td>
+                      <td data-label="COGS %" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.cogs }}</td>
+                      <td data-label="Labor $" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.laborD }}</td>
+                      <td data-label="Labor %" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.labor }}</td>
+                      <td data-label="Prime $" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.primeD }}</td>
+                      <td data-label="Prime %" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right"><span style="font-size:11.5px; font-weight:700; border-radius:999px; padding:3px 10px; background:{{ r.pillBg }}; color:{{ r.pillColor }}">{{ r.prime }}</span></td>
+                      <td data-label="Δ vs Target" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; font-weight:700; color:{{ r.deltaColor }}">{{ r.delta }}</td>
+                      <td data-label="21-day trend" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ r.spark }}" fill="none" stroke="#14284B" stroke-width="1.5" opacity="0.7"></polyline></svg></td>
                     </tr>
                     <tr style="display:{{ r.detailDisplay }}; background:#FFFDF9">
-                      <td colSpan="10" style="padding:16px 18px; border-bottom:1px solid #F1F5F9">
+                      <td class="h24-td-full" colSpan="10" style="padding:16px 18px; border-bottom:1px solid #F1F5F9">
                         <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start">
                           <div style="flex:1.2 1 260px; min-width:0">
                             <div style="display:flex; align-items:center; justify-content:space-between; gap:8px"><div style="font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B">Daily prime % · Jul 1–21</div><span style="font-size:9px; font-weight:600; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px">Toast + MarginEdge</span></div>
@@ -962,7 +974,7 @@
 
           <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:stretch; margin-bottom:20px">
             <div style="flex:1 1 420px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
                 <div>
                   <div style="font-size:14.5px; font-weight:650; color:#0F172A">Margin per pour — price split into cost and margin</div>
                   <div style="font-size:12px; color:#64748B; margin-top:3px">Sorted by margin per pour · navy = cost, orange = margin</div>
@@ -992,7 +1004,7 @@
             </div>
 
             <div style="flex:1.2 1 460px; min-width:0; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
                 <div>
                   <div style="font-size:14.5px; font-weight:650; color:#0F172A">Volume vs margin — which taps to push</div>
                   <div style="font-size:12px; color:#64748B; margin-top:3px">Bubble size = total gross profit · dashed lines = medians</div>
@@ -1038,7 +1050,7 @@
           </div>
 
           <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
               <div>
                 <div style="font-size:14.5px; font-weight:650; color:#0F172A">Draft profitability by beer</div>
                 <div style="font-size:12px; color:#64748B; margin-top:3px">Ranked by total gross profit · click a column to sort · click a row for the cost build-up</div>
@@ -1046,7 +1058,7 @@
               <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Ekos + MarginEdge + Toast</span>
             </div>
             <div style="overflow-x:auto">
-              <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:920px">
+              <table class="h24-tbl" style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:920px">
                 <thead>
                   <tr>
                     <sc-for list="{{ ppCols }}" as="c" hint-placeholder-count="10">
@@ -1057,19 +1069,19 @@
                 <tbody>
                   <sc-for list="{{ ppRows }}" as="r" hint-placeholder-count="6">
                     <tr onClick="{{ r.onExpand }}" style="background:{{ r.bg }}; cursor:pointer">
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9"><div style="display:flex; align-items:center; gap:7px"><span style="font-size:10px; color:#94A3B8">{{ r.chev }}</span><span style="width:9px; height:9px; border-radius:50%; background:{{ r.dot }}; flex-shrink:0"></span><span style="font-size:12.5px; font-weight:650; color:#0F172A">{{ r.beer }}</span><sc-if value="{{ r.low }}" hint-placeholder-val="{{ false }}"><span style="font-size:9px; font-weight:700; color:#B45309; background:#FFFBEB; border:1px solid #FDE68A; border-radius:999px; padding:1px 6px; white-space:nowrap">low inventory</span></sc-if></div></td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ r.style }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ r.abv }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.cost }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.price }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#C2590A">{{ r.margin }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.marginPct }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.pours }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:700; color:#14284B">{{ r.gp }}</td>
-                      <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ r.spark }}" fill="none" stroke="#E8720C" stroke-width="1.5" opacity="0.8"></polyline></svg></td>
+                      <td class="h24-td-head" style="padding:10px; border-bottom:1px solid #F1F5F9"><div style="display:flex; align-items:center; gap:7px"><span style="font-size:10px; color:#94A3B8">{{ r.chev }}</span><span style="width:9px; height:9px; border-radius:50%; background:{{ r.dot }}; flex-shrink:0"></span><span style="font-size:12.5px; font-weight:650; color:#0F172A">{{ r.beer }}</span><sc-if value="{{ r.low }}" hint-placeholder-val="{{ false }}"><span style="font-size:9px; font-weight:700; color:#B45309; background:#FFFBEB; border:1px solid #FDE68A; border-radius:999px; padding:1px 6px; white-space:nowrap">low inventory</span></sc-if></div></td>
+                      <td data-label="Style" style="padding:10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ r.style }}</td>
+                      <td data-label="ABV" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ r.abv }}</td>
+                      <td data-label="Cost/pour" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.cost }}</td>
+                      <td data-label="Pour price" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.price }}</td>
+                      <td data-label="Margin/pour" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#C2590A">{{ r.margin }}</td>
+                      <td data-label="Margin %" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.marginPct }}</td>
+                      <td data-label="Pours" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#334155">{{ r.pours }}</td>
+                      <td data-label="Total GP" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:700; color:#14284B">{{ r.gp }}</td>
+                      <td data-label="21-day pours" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right"><svg width="100" height="28" viewBox="0 0 100 28" style="display:inline-block; vertical-align:middle"><polyline points="{{ r.spark }}" fill="none" stroke="#E8720C" stroke-width="1.5" opacity="0.8"></polyline></svg></td>
                     </tr>
                     <tr style="display:{{ r.detailDisplay }}; background:#FFFDF9">
-                      <td colSpan="10" style="padding:16px 18px; border-bottom:1px solid #F1F5F9">
+                      <td class="h24-td-full" colSpan="10" style="padding:16px 18px; border-bottom:1px solid #F1F5F9">
                         <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start">
                           <div style="flex:1 1 240px; min-width:0">
                             <div style="display:flex; align-items:center; justify-content:space-between; gap:8px"><div style="font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B">Price &amp; pours by taproom</div><span style="font-size:9px; font-weight:600; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 6px">Toast</span></div>
@@ -1125,7 +1137,7 @@
         </div>
 
         <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px; margin-bottom:20px">
-          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
             <div>
               <div style="font-size:14.5px; font-weight:650; color:#0F172A">Source status</div>
               <div style="font-size:12px; color:#64748B; margin-top:3px">Independent ingestion workers → Postgres warehouse (Railway) · orchestrated by nightly cron</div>
@@ -1133,7 +1145,7 @@
             <span style="font-size:9.5px; font-weight:600; letter-spacing:0.04em; color:#64748B; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:999px; padding:2px 7px; white-space:nowrap">Run #412 · Jul 22</span>
           </div>
           <div style="overflow-x:auto">
-            <table style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:820px">
+            <table class="h24-tbl" style="width:100%; border-collapse:collapse; margin-top:12px; font-variant-numeric:tabular-nums; min-width:820px">
               <thead>
                 <tr>
                   <th style="text-align:left; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#64748B; padding:7px 10px; border-bottom:1px solid #E2E8F0">Source</th>
@@ -1148,13 +1160,13 @@
               <tbody>
                 <sc-for list="{{ sourceRows }}" as="sr" hint-placeholder-count="6">
                   <tr style="background:{{ sr.bg }}">
-                    <td style="padding:10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ sr.name }}</td>
-                    <td style="padding:10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ sr.domain }}</td>
-                    <td style="padding:10px; border-bottom:1px solid #F1F5F9"><span style="font-size:10.5px; font-weight:700; border-radius:999px; padding:3px 9px; white-space:nowrap; background:{{ sr.pillBg }}; color:{{ sr.pillColor }}">{{ sr.status }}</span></td>
-                    <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ sr.rows }}</td>
-                    <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ sr.duration }}</td>
-                    <td style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ sr.lastSuccess }}</td>
-                    <td style="padding:10px 10px 10px 24px; border-bottom:1px solid #F1F5F9; font-size:11.5px; color:#475569; font-family:ui-monospace, 'SF Mono', Menlo, Consolas, monospace">{{ sr.method }}</td>
+                    <td class="h24-td-head" style="padding:10px; border-bottom:1px solid #F1F5F9; font-size:12.5px; font-weight:650; color:#0F172A">{{ sr.name }}</td>
+                    <td data-label="Domain" style="padding:10px; border-bottom:1px solid #F1F5F9; font-size:12px; color:#475569">{{ sr.domain }}</td>
+                    <td data-label="Status" style="padding:10px; border-bottom:1px solid #F1F5F9"><span style="font-size:10.5px; font-weight:700; border-radius:999px; padding:3px 9px; white-space:nowrap; background:{{ sr.pillBg }}; color:{{ sr.pillColor }}">{{ sr.status }}</span></td>
+                    <td data-label="Rows loaded" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; font-weight:650; color:#14284B">{{ sr.rows }}</td>
+                    <td data-label="Duration" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12.5px; color:#334155">{{ sr.duration }}</td>
+                    <td data-label="Last success" style="padding:10px; border-bottom:1px solid #F1F5F9; text-align:right; font-size:12px; color:#475569">{{ sr.lastSuccess }}</td>
+                    <td data-label="Sync method" style="padding:10px 10px 10px 24px; border-bottom:1px solid #F1F5F9; font-size:11.5px; color:#475569; font-family:ui-monospace, 'SF Mono', Menlo, Consolas, monospace">{{ sr.method }}</td>
                   </tr>
                 </sc-for>
               </tbody>
@@ -1166,7 +1178,7 @@
         <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start">
           <div style="flex:1.3 1 480px; min-width:0; display:flex; flex-direction:column; gap:20px">
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:16px; padding:20px">
-              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
                 <div>
                   <div style="font-size:14.5px; font-weight:650; color:#0F172A">Run history — last 7 nights</div>
                   <div style="font-size:12px; color:#64748B; margin-top:3px">Bar length = total run duration</div>
@@ -1762,7 +1774,7 @@ class Component extends DCLogic {
         spark:primeSpark(r.i), bg: exp ? '#FFF7ED' : (ri%2 ? '#F8FAFC' : '#FFFFFF'),
         chev: exp ? '▾' : '▸',
         onExpand: ()=>this.setState({rpExpand: this.state.rpExpand===r.i ? null : r.i}),
-        detailDisplay: exp ? 'table-row' : 'none',
+        detailDisplay: exp ? (this.isMobile() ? 'block' : 'table-row') : 'none',
         miniLine:miniLine(r.i),
         cogsCats: det.cogs.slice(0,5).map(c=>({cat:c[0], spend:this.fmt$(c[1]), pct:(c[1]/this.LOCS[r.i].revenue*100).toFixed(1)+'%'})),
         dayparts: this.DAYPARTS.map((d,di)=>({label:d, hrs:Math.round(this.LABOR_HRS[r.i].actual*dpShare[di]).toLocaleString('en-US'), pct:(this.LOCS[r.i].labor+dpOff[di]).toFixed(1)+'%'}))
@@ -1850,7 +1862,7 @@ class Component extends DCLogic {
         margin:'$'+b.margin.toFixed(2), marginPct:b.marginPct.toFixed(1)+'%', pours:b.poursP.toLocaleString('en-US'), gp:fmtK(b.gp),
         low:b.low, dot:bcOf(b.beer), spark:ppSpark(b.beer), bg: exp ? '#FFF7ED' : (ri%2?'#F8FAFC':'#FFFFFF'), chev: exp?'▾':'▸',
         onExpand:()=>this.setState({ppExpand: this.state.ppExpand===b.beer ? null : b.beer}),
-        detailDisplay: exp?'table-row':'none',
+        detailDisplay: exp ? (this.isMobile() ? 'block' : 'table-row') : 'none',
         byTaproom: this.LOCS.map((l,li)=>({ loc:locShortName(l.name), price:'$'+(b.price+priceOff[li]).toFixed(2), pours:Math.round(b.pours*volShare[li]*ppFactor).toLocaleString('en-US') })),
         costRows:[
           {k:'Ingredients', v:'$'+b.ingr.toFixed(2), bt:'none', fw:'400', fc:'#475569'},
