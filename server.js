@@ -295,7 +295,22 @@ app.get('/admin/api/health', async (req, res) => {
   catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
-// Static files (prototype + /admin). API routes above take precedence.
+// Serve the prototype at the root and at both the ".dc" and ".dc.html" forms.
+// (Earlier static hosting issued clean-URL 301s that browsers cached, so
+// requests can arrive for "/Hangar 24 Ops.dc" without the .html — handle both,
+// and load the app directly at "/" so no redirect is needed at all.)
+const APP_HTML = path.join(ROOT, 'Hangar 24 Ops.dc.html');
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+  let p;
+  try { p = decodeURIComponent(req.path); } catch (e) { p = req.path; }
+  if (p === '/' || p === '/index.html' || p === '/Hangar 24 Ops.dc' || p === '/Hangar 24 Ops.dc.html') {
+    return res.sendFile(APP_HTML);
+  }
+  next();
+});
+
+// Static files (support.js, /admin, etc.). API + app routes above take precedence.
 app.use(express.static(ROOT, { extensions: ['html'] }));
 
 app.listen(PORT, () => {
