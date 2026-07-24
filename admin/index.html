@@ -63,6 +63,32 @@
   .splitrow .track > span{display:block;height:100%;border-radius:5px;}
   .splitrow .pct{font-size:12px;font-weight:650;color:var(--navy);width:44px;text-align:right;font-variant-numeric:tabular-nums;}
   .empty{color:#94A3B8;font-size:13px;padding:18px 2px;}
+  /* recent visitors */
+  .visrow{display:grid;grid-template-columns:1fr 62px 118px;gap:12px;align-items:center;padding:11px 0;border-top:1px solid #F1F5F9;}
+  .visrow:first-child{border-top:none;}
+  .visrow > div{min-width:0;} /* let the 1fr column shrink so nowrap text ellipsises */
+  .visid{font-size:13px;font-weight:650;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .vissub{font-size:11px;color:#94A3B8;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .viscount{text-align:right;font-variant-numeric:tabular-nums;}
+  .viscount b{font-size:15px;font-weight:700;color:var(--navy);display:block;}
+  .viscount span{font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:0.05em;}
+  .viswhen{text-align:right;font-variant-numeric:tabular-nums;}
+  .viswhen .d{font-size:12.5px;font-weight:650;color:#334155;white-space:nowrap;}
+  .viswhen .t{font-size:11.5px;color:#94A3B8;white-space:nowrap;margin-top:2px;}
+  .chip{display:inline-block;font-size:10px;font-weight:650;color:#475569;background:#F1F5F9;border:1px solid var(--line);border-radius:999px;padding:1px 7px;margin-right:4px;}
+  @media(max-width:600px){
+    .visrow{grid-template-columns:1fr auto;}
+    .visrow .viswhen{grid-column:1 / -1;text-align:left;display:flex;gap:8px;align-items:baseline;}
+    .visrow .viswhen .t{margin-top:0;}
+  }
+  /* views by day */
+  .dayrow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:9px 0;border-top:1px solid #F1F5F9;font-variant-numeric:tabular-nums;}
+  .dayrow:first-child{border-top:none;}
+  .dayrow > div{min-width:0;}
+  .dayrow .dd{font-size:12.5px;font-weight:650;color:#334155;white-space:nowrap;}
+  .dayrow .dsub{font-size:11px;color:#94A3B8;margin-top:2px;white-space:nowrap;}
+  .dayrow .dv{font-size:15px;font-weight:700;color:var(--navy);text-align:right;}
+  .dayrow .dv span{display:block;font-size:10px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.05em;}
   .foot{font-size:11.5px;color:#94A3B8;margin-top:22px;line-height:1.6;text-wrap:pretty;}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);display:inline-block;}
   .controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;
@@ -130,6 +156,20 @@
           <span class="tag" id="cityCount">— cities</span>
         </div>
         <div class="cities-grid" id="cities"></div>
+      </div>
+    </section>
+
+    <section class="grid two">
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">Recent visitors</div><div class="panel-sub">10 most recent · pages viewed, date &amp; time</div></div>
+          <span class="tag">Local time (PT)</span>
+        </div>
+        <div class="rows" id="recent"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">Views by day</div><div class="panel-sub" id="daysSub">Days with activity</div></div></div>
+        <div class="rows" id="byday"></div>
       </div>
     </section>
 
@@ -234,6 +274,43 @@
     }).join('');
   }
 
+  function renderRecent(list){
+    var box=el('recent');
+    if(!list || !list.length){ box.innerHTML='<div class="empty">No visitors yet.</div>'; return; }
+    box.innerHTML = list.map(function(v){
+      var where = v.city ? (v.city + (v.region ? ', '+v.region : '')) : 'Unknown location';
+      var who = (v.anon ? 'Visitor' : 'Visitor ' + v.id);
+      var bits = [];
+      if(v.device) bits.push(v.device);
+      if(v.source) bits.push(v.source);
+      var screens = (v.screens||[]).slice(0,3).join(', ');
+      var more = (v.screens||[]).length > 3 ? ' +'+((v.screens.length)-3)+' more' : '';
+      var spanNote = (v.first && v.last && v.first.date !== v.last.date) ? (' · first seen '+v.first.date) : '';
+      return '<div class="visrow">'+
+        '<div><div class="visid">'+esc(where)+' <span class="chip">'+esc(who)+'</span></div>'+
+        '<div class="vissub">'+esc(bits.join(' · '))+(screens?(' — '+esc(screens)+esc(more)):'')+esc(spanNote)+'</div></div>'+
+        '<div class="viscount"><b>'+fmt(v.views)+'</b><span>'+(v.views===1?'page':'pages')+'</span></div>'+
+        '<div class="viswhen"><div class="d">'+esc(v.last.date)+'</div><div class="t">'+esc(v.last.time)+'</div></div>'+
+        '</div>';
+    }).join('');
+  }
+
+  function renderByDay(daily){
+    var active = daily.filter(function(d){ return d.count>0; }).slice().reverse();
+    el('daysSub').textContent = active.length ? (active.length+' day'+(active.length>1?'s':'')+' with activity') : 'Days with activity';
+    var box=el('byday');
+    if(!active.length){ box.innerHTML='<div class="empty">No activity in the last 30 days.</div>'; return; }
+    box.innerHTML = active.map(function(d){
+      var p=d.date.split('-');
+      var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][(+p[1])-1];
+      var label = mo+' '+(+p[2])+', '+p[0];
+      return '<div class="dayrow">'+
+        '<div><div class="dd">'+label+'</div>'+
+        '<div class="dsub">'+fmt(d.visitors)+' visitor'+(d.visitors===1?'':'s')+'</div></div>'+
+        '<div class="dv">'+fmt(d.count)+'<span>views</span></div></div>';
+    }).join('');
+  }
+
   var PALETTE=['#14284B','#E8720C','#3B5C93','#94A3B8','#B45309','#0EA5E9'];
   function renderSplit(id, items){
     var box=el(id);
@@ -282,6 +359,8 @@
     renderKpis(s.totals);
     renderChart(s.daily);
     renderCities(s.cities, s.totals.pageViews, s.totals.cities);
+    renderRecent(s.recent);
+    renderByDay(s.daily);
     renderPages(s.pages);
     renderSplit('devices', s.devices);
     renderSplit('sources', s.sources);

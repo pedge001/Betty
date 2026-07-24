@@ -39,6 +39,48 @@ const DAY = 86400000;
 function laDate(ts) {
   return new Date(ts).toLocaleDateString('en-CA', { timeZone: TZ }); // YYYY-MM-DD
 }
+/** Human date + clock time in the brewery's local timezone. */
+function laParts(ts) {
+  const d = new Date(ts);
+  return {
+    date: d.toLocaleDateString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric' }),
+    time: d.toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' }),
+    ymd: laDate(ts),
+    iso: d.toISOString()
+  };
+}
+/** The 10 most recent visitors, with page count and first/last activity. */
+function recentVisitors(rows, n) {
+  const sorted = rows.slice().sort((a, b) => a.ts - b.ts); // chronological
+  const byVisitor = new Map();
+  for (const r of sorted) {
+    const key = r.visitor_id || ('anon|' + (r.city || '?') + '|' + (r.device || '?'));
+    let e = byVisitor.get(key);
+    if (!e) {
+      e = { key, views: 0, firstTs: r.ts, lastTs: r.ts, city: r.city, region: r.region,
+            country: r.country, device: r.device, source: r.source, screens: [] };
+      byVisitor.set(key, e);
+    }
+    e.views++;
+    e.lastTs = r.ts;
+    if (r.city) { e.city = r.city; e.region = r.region; e.country = r.country; }
+    if (r.device) e.device = r.device;
+    if (r.source) e.source = r.source;
+    const s = (r.screen && r.screen.trim()) ? r.screen : (r.path || '/');
+    if (s && e.screens.indexOf(s) === -1) e.screens.push(s);
+  }
+  return [...byVisitor.values()]
+    .sort((a, b) => b.lastTs - a.lastTs)
+    .slice(0, n)
+    .map(v => ({
+      id: String(v.key).replace(/^anon\|/, '').slice(0, 6),
+      anon: !v.key || String(v.key).startsWith('anon|'),
+      city: v.city || null, region: v.region || null, country: v.country || null,
+      device: v.device || null, source: v.source || null,
+      views: v.views, screens: v.screens.slice(0, 8),
+      first: laParts(v.firstTs), last: laParts(v.lastTs)
+    }));
+}
 function last30Days() {
   const out = [];
   const now = Date.now();
@@ -78,8 +120,11 @@ function buildStats(rows60, ignoredSet, excludeSelf, storeKind) {
     prev = prev.filter(keep);
   }
   const days = last30Days();
-  const dayMap = new Map(days.map(d => [d, 0]));
-  for (const r of rows) { const d = laDate(r.ts); if (dayMap.has(d)) dayMap.set(d, dayMap.get(d) + 1); }
+  const dayMap = new Map(days.map(d => [d, { count: 0, visitors: new Set() }]));
+  for (const r of rows) {
+    const e = dayMap.get(laDate(r.ts));
+    if (e) { e.count++; if (r.visitor_id) e.visitors.add(r.visitor_id); }
+  }
   const todayStr = days[days.length - 1];
   const distinct = (arr) => new Set(arr.filter(Boolean)).size;
 
@@ -100,7 +145,8 @@ function buildStats(rows60, ignoredSet, excludeSelf, storeKind) {
       pageViewsPrev: prev.length,
       visitorsPrev: distinct(prev.map(r => r.visitor_id))
     },
-    daily: days.map(d => ({ date: d, count: dayMap.get(d) })),
+    daily: days.map(d => ({ date: d, count: dayMap.get(d).count, visitors: dayMap.get(d).visitors.size })),
+    recent: recentVisitors(rows, 10),
     cities: topCities(rows, 12),
     pages: topN(rows, r => (r.screen && r.screen.trim()) ? r.screen : (r.path || '/'), 8),
     devices: topN(rows, r => r.device, 5),
@@ -313,6 +359,11 @@ app.use((req, res, next) => {
 // Static files (support.js, /admin, etc.). API + app routes above take precedence.
 app.use(express.static(ROOT, { extensions: ['html'] }));
 
-app.listen(PORT, () => {
-  console.log(`[betty] listening on ${PORT} · store=${store.kind} · geo=${!!geoip}`);
-});
+// Only listen when run directly, so the aggregation helpers can be unit-tested.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`[betty] listening on ${PORT} · store=${store.kind} · geo=${!!geoip}`);
+  });
+}
+
+module.exports = { app, buildStats, recentVisitors, laParts, laDate };
